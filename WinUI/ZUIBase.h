@@ -1,11 +1,26 @@
 #ifndef ZUI_ZUIBASE_HEADER
 #define ZUI_ZUIBASE_HEADER
 #include "ZBase.h"
+#include "ZPaintManager.h"
 #include <Windows.h>
 #include <iostream>
+#include <vector>
 #include <assert.h>
 namespace ZUI
 {
+	class ZControl :
+		public ZObject
+	{
+	public:
+		ZControl()
+		{}
+		virtual ~ZControl()
+		{}
+	public:
+		virtual void DrawSelf(HWND owner, ZGdiplusManager* painter) = 0;
+		virtual void Release() = 0;
+	};
+
 	template <class WndCls>
 	class ZWinBase :
 		public ZObject
@@ -15,7 +30,12 @@ namespace ZUI
 			m_hWnd(NULL)
 		{}
 		virtual ~ZWinBase()
-		{}
+		{
+			for each (auto control in m_pControls)
+			{
+				control->Release();
+			}
+		}
 	public:
 		BOOL Create(
 			PCWSTR lpWindowName,
@@ -59,6 +79,10 @@ namespace ZUI
 			assert(m_hWnd != NULL);
 			return ::GetClientRect(m_hWnd, rc);
 		}
+		BOOL GetWindowRect(LPRECT rc) {
+			assert(m_hWnd != NULL);
+			return ::GetWindowRect(m_hWnd, rc);
+		}
 		void Invalidate() {
 			assert(m_hWnd != NULL);
 			RECT rc;
@@ -84,6 +108,9 @@ namespace ZUI
 				pThis = reinterpret_cast<WndCls*>(::GetWindowLong(hWnd, GWLP_USERDATA));
 			}
 			if (pThis != NULL) {
+				if (uMsg == WM_PAINT) {
+					pThis->DrawMySelf();
+				}
 				return pThis->HandleMessage(hWnd, uMsg, wParam, lParam);
 			}
 			else {
@@ -105,10 +132,21 @@ namespace ZUI
 		virtual LPCTSTR GetDefaultCursor() const {
 			return IDC_ARROW;
 		}
-
+		void DrawMySelf() {
+			for each (auto control in m_pControls)
+			{
+				ZGdiplusManager* painter = new ZGdiplusManager();
+				control->DrawSelf(m_hWnd, painter);
+				painter->Release();
+			}
+		}
+		void AddControl(ZControl* control) {
+			assert(control != NULL);
+			m_pControls.push_back(control);
+		}
 	private:
-		HWND m_hWnd;
-
+		HWND					m_hWnd;
+		std::vector<ZControl*>	m_pControls;
 	};
 }
 #endif //ZUI_ZUIBASE_HEADER

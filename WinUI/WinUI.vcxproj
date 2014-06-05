@@ -84,9 +84,11 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="WinUI.h" />
     <ClInclude Include="ZBase.h" />
+    <ClInclude Include="ZCommonControls.h" />
     <ClInclude Include="ZCommonWnd.h" />
     <ClInclude Include="ZEvent.h" />
     <ClInclude Include="ZHead.h" />
+    <ClInclude Include="ZPaintManager.h" />
     <ClInclude Include="ZUIBase.h" />
   </ItemGroup>
   <ItemGroup>
@@ -95,7 +97,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="WinUI.cpp" />
+    <ClCompile Include="ZCommonControls.cpp" />
     <ClCompile Include="ZCommonWnd.cpp" />
+    <ClCompile Include="ZPaintManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WinUI.rc" />

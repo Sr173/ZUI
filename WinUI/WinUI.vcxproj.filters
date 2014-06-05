@@ -51,6 +51,12 @@
     <ClInclude Include="ZCommonWnd.h">
       <Filter>MyControls</Filter>
     </ClInclude>
+    <ClInclude Include="ZCommonControls.h">
+      <Filter>MyControls</Filter>
+    </ClInclude>
+    <ClInclude Include="ZPaintManager.h">
+      <Filter>MyControls</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -60,6 +66,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="ZCommonWnd.cpp">
+      <Filter>MyControls</Filter>
+    </ClCompile>
+    <ClCompile Include="ZCommonControls.cpp">
+      <Filter>MyControls</Filter>
+    </ClCompile>
+    <ClCompile Include="ZPaintManager.cpp">
       <Filter>MyControls</Filter>
     </ClCompile>
   </ItemGroup>

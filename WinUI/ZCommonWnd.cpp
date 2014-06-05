@@ -10,7 +10,26 @@ namespace ZUI
 	namespace ZCommonWnd
 	{
 		//CmnMsgWnd
-		void CmnMsgWnd::SetText(LPCWSTR text)
+		BOOL CmnMsgWnd::Create(LPCWSTR lpWindowName, int nWidth, int nHeight, LPCWSTR text, HWND parent)
+		{
+			RECT rc;
+			if (parent == NULL) {
+				HWND hwnd = ::GetDesktopWindow();
+				::GetWindowRect(hwnd, &rc);
+			}
+			else {
+				::GetWindowRect(parent, &rc);
+			}
+			int x = (rc.right + rc.left - nWidth) / 2;
+			int y = (rc.bottom + rc.top - nHeight) / 2;
+			BOOL bret = ZWinBase<CmnMsgWnd>::Create(lpWindowName,
+				WS_BORDER, 0L, x, y, nWidth, nHeight, parent);
+			if (text != NULL && bret) {
+				SetText(text);
+			}
+			return bret;
+		}
+		CmnMsgWnd& CmnMsgWnd::SetText(LPCWSTR text)
 		{
 			if (m_lpText != NULL) {
 				delete[] m_lpText;
@@ -22,6 +41,26 @@ namespace ZUI
 				_tcscpy_s(m_lpText, (len + 1)*sizeof(WCHAR), text);
 			}
 			Invalidate();
+			return *this;
+		}
+		CmnMsgWnd& CmnMsgWnd::SetTextColor(BYTE r, BYTE g, BYTE b, BYTE a)
+		{
+			m_fontColor.r = r;
+			m_fontColor.g = g;
+			m_fontColor.b = b;
+			m_fontColor.a = a;
+			Invalidate();
+			return *this;
+		}
+
+		CmnMsgWnd& CmnMsgWnd::SetBackColor(BYTE r, BYTE g, BYTE b, BYTE a)
+		{
+			m_backColor.r = r;
+			m_backColor.g = g;
+			m_backColor.b = b;
+			m_backColor.a = a;
+			Invalidate();
+			return *this;
 		}
 		LPCTSTR CmnMsgWnd::ClassName() const
 		{
@@ -38,6 +77,9 @@ namespace ZUI
 				OnPaint(hdc);
 				::EndPaint(hWnd, &ps);
 				break;
+			case WM_SIZE:
+				Invalidate();
+				return DefWindowProc(hWnd, uMsg, wParam, lParam);
 			case WM_DESTROY:
 				PostQuitMessage(0);
 				break;
@@ -54,17 +96,26 @@ namespace ZUI
 			GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 
 			Graphics graphics(hdc);
-			graphics.Clear(Color(255, 255, 255, 255));
-			SolidBrush brush(Color(255, 0, 0, 0));
+			Gdiplus::Color backColor(m_backColor.a,
+				m_backColor.r, m_backColor.g, m_backColor.b);
+			Gdiplus::Color fontColor(m_fontColor.a,
+				m_fontColor.r, m_fontColor.g, m_fontColor.b);
+			graphics.Clear(backColor);
+			SolidBrush brush(fontColor);
 			FontFamily fontFamily(L"Times New Roman");
-			Font font(&fontFamily, 24, FontStyleRegular, UnitPixel);
+			Font font(&fontFamily, 
+				static_cast<Gdiplus::REAL>(m_fontSize),
+				FontStyleRegular, UnitPixel);
 			
 			RECT rc;
 			GetClientRect(&rc);
-			float x = 0.f;
+			float x = static_cast<float>(rc.right / 2);
 			float y = static_cast<float>(rc.bottom / 2);
 			PointF pt(x, y);
-			graphics.DrawString(m_lpText, -1, &font, pt, &brush);
+			StringFormat format;
+			format.SetAlignment(StringAlignment::StringAlignmentCenter);
+			format.SetLineAlignment(StringAlignment::StringAlignmentCenter);
+			graphics.DrawString(m_lpText, -1, &font, pt, &format, &brush);
 
 			GdiplusShutdown(gdiplusToken);
 		}
