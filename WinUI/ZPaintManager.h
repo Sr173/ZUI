@@ -23,6 +23,17 @@ namespace ZUI
 		{
 			delete this;
 		}
+	public:
+		static int MessageLoop()
+		{
+			MSG msg;
+			while (GetMessage(&msg, NULL, 0, 0))
+			{
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
+			return (int)msg.wParam;
+		}
 	private:
 		Gdiplus::GdiplusStartupInput	gdiplusStartupInput;
 		ULONG_PTR						gdiplusToken;

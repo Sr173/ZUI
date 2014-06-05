@@ -27,7 +27,8 @@ namespace ZUI
 	{
 	public:
 		ZWinBase() :
-			m_hWnd(NULL)
+			m_hWnd(NULL),
+			m_paintManager(NULL)
 		{}
 		virtual ~ZWinBase()
 		{
@@ -97,6 +98,7 @@ namespace ZUI
 		//static method
 		static LRESULT __stdcall WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
+			LRESULT lret = 0;
 			WndCls* pThis = NULL;
 			if (uMsg == WM_NCCREATE) {
 				LPCREATESTRUCT lpcs = reinterpret_cast<LPCREATESTRUCT>(lParam);
@@ -108,45 +110,40 @@ namespace ZUI
 				pThis = reinterpret_cast<WndCls*>(::GetWindowLong(hWnd, GWLP_USERDATA));
 			}
 			if (pThis != NULL) {
+				lret = pThis->HandleMessage(hWnd, uMsg, wParam, lParam);
 				if (uMsg == WM_PAINT) {
 					pThis->DrawMySelf();
 				}
-				return pThis->HandleMessage(hWnd, uMsg, wParam, lParam);
 			}
 			else {
-				return DefWindowProc(hWnd, uMsg, wParam, lParam);
+				lret = DefWindowProc(hWnd, uMsg, wParam, lParam);
 			}
+			return lret;
 		}
-		static int MessageLoop()
-		{
-			MSG msg;
-			while (GetMessage(&msg, NULL, 0, 0))
-			{
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
-			return (int)msg.wParam;
-		}
+
 	public:
 		//some default function
 		virtual LPCTSTR GetDefaultCursor() const {
 			return IDC_ARROW;
 		}
 		void DrawMySelf() {
+			assert(m_paintManager != NULL);
 			for each (auto control in m_pControls)
 			{
-				ZGdiplusManager* painter = new ZGdiplusManager();
-				control->DrawSelf(m_hWnd, painter);
-				painter->Release();
+				control->DrawSelf(m_hWnd, m_paintManager);
 			}
 		}
 		void AddControl(ZControl* control) {
 			assert(control != NULL);
 			m_pControls.push_back(control);
 		}
+		void SetPaintManager(ZGdiplusManager* painter) {
+			m_paintManager = painter;
+		}
 	private:
 		HWND					m_hWnd;
 		std::vector<ZControl*>	m_pControls;
+		ZGdiplusManager*		m_paintManager;
 	};
 }
 #endif //ZUI_ZUIBASE_HEADER

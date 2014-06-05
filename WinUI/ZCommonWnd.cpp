@@ -79,7 +79,7 @@ namespace ZUI
 				break;
 			case WM_SIZE:
 				Invalidate();
-				return DefWindowProc(hWnd, uMsg, wParam, lParam);
+				break;
 			case WM_DESTROY:
 				PostQuitMessage(0);
 				break;
@@ -91,9 +91,6 @@ namespace ZUI
 		void CmnMsgWnd::OnPaint(HDC hdc)
 		{
 			if (m_lpText == NULL) return;
-			GdiplusStartupInput gdiplusStartupInput;
-			ULONG_PTR           gdiplusToken;
-			GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 
 			Graphics graphics(hdc);
 			Gdiplus::Color backColor(m_backColor.a,
@@ -116,8 +113,6 @@ namespace ZUI
 			format.SetAlignment(StringAlignment::StringAlignmentCenter);
 			format.SetLineAlignment(StringAlignment::StringAlignmentCenter);
 			graphics.DrawString(m_lpText, -1, &font, pt, &format, &brush);
-
-			GdiplusShutdown(gdiplusToken);
 		}
 		//CmnMsgWnd
 	}
