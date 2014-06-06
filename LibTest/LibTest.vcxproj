@@ -11,9 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{43DEF742-9147-40F8-BE70-A73B0839B6B2}</ProjectGuid>
+    <ProjectGuid>{FD89B1AD-F42A-4D57-B2D7-57DF9457263C}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>WinUI</RootNamespace>
+    <RootNamespace>LibTest</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -47,67 +47,54 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
+    <ClCompile Include="..\WinUI\ZBase.cpp" />
+    <ClCompile Include="..\WinUI\ZCommonControls.cpp" />
+    <ClCompile Include="..\WinUI\ZCommonWnd.cpp" />
+    <ClCompile Include="..\WinUI\ZPaintManager.cpp" />
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="ZEventTest.cpp" />
+    <ClCompile Include="ZFuncTest.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Resource.h" />
-    <ClInclude Include="stdafx.h" />
-    <ClInclude Include="targetver.h" />
-    <ClInclude Include="WinUI.h" />
-    <ClInclude Include="ZBase.h" />
-    <ClInclude Include="ZCommonControls.h" />
-    <ClInclude Include="ZCommonWnd.h" />
-    <ClInclude Include="ZEvent.h" />
-    <ClInclude Include="ZHead.h" />
-    <ClInclude Include="ZPaintManager.h" />
-    <ClInclude Include="ZUIBase.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="stdafx.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="WinUI.cpp" />
-    <ClCompile Include="ZBase.cpp" />
-    <ClCompile Include="ZCommonControls.cpp" />
-    <ClCompile Include="ZCommonWnd.cpp" />
-    <ClCompile Include="ZPaintManager.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="WinUI.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="small.ico" />
-    <Image Include="WinUI.ico" />
+    <ClInclude Include="..\WinUI\ZBase.h" />
+    <ClInclude Include="..\WinUI\ZCommonControls.h" />
+    <ClInclude Include="..\WinUI\ZCommonWnd.h" />
+    <ClInclude Include="..\WinUI\ZEvent.h" />
+    <ClInclude Include="..\WinUI\ZHead.h" />
+    <ClInclude Include="..\WinUI\ZPaintManager.h" />
+    <ClInclude Include="..\WinUI\ZUIBase.h" />
+    <ClInclude Include="Test.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

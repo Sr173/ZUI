@@ -5,6 +5,10 @@ VisualStudioVersion = 12.0.30110.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WinUI", "WinUI\WinUI.vcxproj", "{43DEF742-9147-40F8-BE70-A73B0839B6B2}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WinUITest", "WinUITest\WinUITest.vcxproj", "{04F4F8AD-C2A9-4A4D-8D7B-29B40AD2F9B2}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LibTest", "LibTest\LibTest.vcxproj", "{FD89B1AD-F42A-4D57-B2D7-57DF9457263C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -15,6 +19,14 @@ Global
 		{43DEF742-9147-40F8-BE70-A73B0839B6B2}.Debug|Win32.Build.0 = Debug|Win32
 		{43DEF742-9147-40F8-BE70-A73B0839B6B2}.Release|Win32.ActiveCfg = Release|Win32
 		{43DEF742-9147-40F8-BE70-A73B0839B6B2}.Release|Win32.Build.0 = Release|Win32
+		{04F4F8AD-C2A9-4A4D-8D7B-29B40AD2F9B2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{04F4F8AD-C2A9-4A4D-8D7B-29B40AD2F9B2}.Debug|Win32.Build.0 = Debug|Win32
+		{04F4F8AD-C2A9-4A4D-8D7B-29B40AD2F9B2}.Release|Win32.ActiveCfg = Release|Win32
+		{04F4F8AD-C2A9-4A4D-8D7B-29B40AD2F9B2}.Release|Win32.Build.0 = Release|Win32
+		{FD89B1AD-F42A-4D57-B2D7-57DF9457263C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FD89B1AD-F42A-4D57-B2D7-57DF9457263C}.Debug|Win32.Build.0 = Debug|Win32
+		{FD89B1AD-F42A-4D57-B2D7-57DF9457263C}.Release|Win32.ActiveCfg = Release|Win32
+		{FD89B1AD-F42A-4D57-B2D7-57DF9457263C}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

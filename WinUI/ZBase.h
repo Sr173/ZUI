@@ -1,6 +1,7 @@
 #ifndef ZUI_ZBASE_HEADER
 #define ZUI_ZBASE_HEADER
 #include <iostream>
+#include <windows.h>
 namespace ZUI
 {
 	class ZObject
@@ -138,5 +139,15 @@ namespace ZUI
 			r = _r; g = _g; b = _b; a = _a;
 		}
 	};
+	inline bool PointInRect(long x, long y, const RECT& rc)
+	{
+		return (rc.left <= x&&rc.right >= x&&
+			rc.bottom >= y&&rc.top <= y) ? true : false;
+	}
+	inline bool PointInRect(const POINT& pt, const RECT& rc)
+	{
+		return PointInRect(pt.x, pt.y, rc);
+	}
+	bool IsRectCross(const RECT& rc1, const RECT& rc2);
 }
 #endif //ZUI_ZBASE_HEADER

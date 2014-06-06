@@ -8,9 +8,10 @@ using namespace Gdiplus;
 #include <assert.h>
 namespace ZUI
 {
-	void ZLabel::DrawSelf(HWND owner, ZGdiplusManager* painter)
+	void ZLabel::DrawSelf(HWND owner, ZGdiplusManager* painter, const RECT& _rc)
 	{
 		assert(IsWindow(owner));
+		if (!IsRectCross(_rc, m_rc)) return;
 		Gdiplus::Graphics				graphics(owner);
 		Gdiplus::Color backColor =		ZColor2GdiColor(m_backColor);
 		Gdiplus::Color fontColor =		ZColor2GdiColor(m_fontColor);

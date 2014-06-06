@@ -11,10 +11,12 @@ namespace ZUI
 	{
 	public:
 		ZLabel() :
+			ZControl(),
 			m_fontColor(0, 0, 0),
 			m_backColor(255, 255, 255, 0),
 			m_borderColor(0, 0, 0),
-			m_fontSize(12)
+			m_fontSize(12),
+			m_bMouseIn(false)
 		{
 			m_rc.left = 10; m_rc.top = 10;
 			m_rc.right = 60; m_rc.bottom = 30;
@@ -23,7 +25,7 @@ namespace ZUI
 		{}
 	public:
 		//ZControl methods
-		virtual void DrawSelf(HWND owner, ZGdiplusManager* painter);
+		virtual void DrawSelf(HWND owner, ZGdiplusManager* painter, const RECT& rc);
 		virtual void Release();
 	public:
 		ZLabel&		SetText(const ZStringW& text) {
@@ -43,6 +45,7 @@ namespace ZUI
 		}
 		ZLabel&		SetBackColor(BYTE r, BYTE g, BYTE b, BYTE a = 255) {
 			m_backColor = ZColor(r, g, b, a);
+
 			return *this;
 		}
 		ZLabel&		SetBorderColor(BYTE r, BYTE g, BYTE b, BYTE a = 255) {
@@ -77,13 +80,72 @@ namespace ZUI
 			m_rc.top = y;
 			return *this;
 		}
-	private:
+		void Invalidate()
+		{
+			assert(::IsWindow(m_parent));
+			::InvalidateRect(m_parent, &m_rc, TRUE);
+		}
+	public:
+		//message function
+		void NotifyOnLButtonUp(MouseFunc func) {
+			m_lbuttonUp.subscribe(func);
+		}
+		void NotifyOnRButtonUp(MouseFunc func) {
+			m_rbuttonUp.subscribe(func);
+		}
+		void NotifyOnMouseMove(MouseFunc func) {
+			m_mouseMove.subscribe(func);
+		}
+		void NotifyOnMouseMoveIn(MouseFunc func) {
+			m_mouseMoveIn.subscribe(func);
+		}
+		void NotifyOnMouseMoveOut(MouseFunc func) {
+			m_mouseMoveOut.subscribe(func);
+		}
+		virtual LONG OnLButtonUp(ZControl* con, ZMouseState s)
+		{
+			if (PointInRect(s.x, s.y, m_rc)) {
+				m_lbuttonUp.Invoke(con, s);
+			}
+			return 0;
+		}
+		virtual LONG OnRButtonUp(ZControl* con, ZMouseState s)
+		{
+			if (PointInRect(s.x, s.y, m_rc)) {
+				m_rbuttonUp.Invoke(con, s);
+			}
+			return 0;
+		}
+		virtual LONG OnMouseMove(ZControl* con, ZMouseState s)
+		{
+			if (PointInRect(s.x, s.y, m_rc)) {
+				if (!m_bMouseIn) {
+					m_bMouseIn = true;
+					m_mouseMoveIn.Invoke(con, s);
+				}
+				m_mouseMove.Invoke(con, s);
+			}
+			else {
+				if (m_bMouseIn) {
+					m_bMouseIn = false;
+					m_mouseMoveOut.Invoke(con, s);
+				}
+			}
+			return 0;
+		}
+	protected:
 		ZStringW	m_text;	//Label text
 		int			m_fontSize;
 		RECT		m_rc; //layout
 		ZColor		m_fontColor;
 		ZColor		m_backColor;
 		ZColor		m_borderColor;
+		ZMouseEvent m_lbuttonUp;
+		ZMouseEvent m_mouseMove;
+		bool		m_bMouseIn;
+		ZMouseEvent m_mouseMoveIn;
+		ZMouseEvent m_mouseMoveOut;
+		ZMouseEvent m_rbuttonUp;
 	};
 }
 

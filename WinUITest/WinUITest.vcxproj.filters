@@ -13,12 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="MyControls">
-      <UniqueIdentifier>{c48cdfdc-c772-4cc6-bf9e-a33fe216b287}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Special">
-      <UniqueIdentifier>{6871ff38-a929-467b-94e3-77b67df5c7a1}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -33,53 +27,20 @@
     <ClInclude Include="Resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="WinUI.h">
+    <ClInclude Include="WinUITest.h">
       <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="ZUIBase.h">
-      <Filter>MyControls</Filter>
-    </ClInclude>
-    <ClInclude Include="ZEvent.h">
-      <Filter>MyControls</Filter>
-    </ClInclude>
-    <ClInclude Include="ZBase.h">
-      <Filter>MyControls</Filter>
-    </ClInclude>
-    <ClInclude Include="ZHead.h">
-      <Filter>MyControls</Filter>
-    </ClInclude>
-    <ClInclude Include="ZCommonWnd.h">
-      <Filter>MyControls</Filter>
-    </ClInclude>
-    <ClInclude Include="ZCommonControls.h">
-      <Filter>MyControls</Filter>
-    </ClInclude>
-    <ClInclude Include="ZPaintManager.h">
-      <Filter>MyControls</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="WinUI.cpp">
+    <ClCompile Include="WinUITest.cpp">
       <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="ZCommonWnd.cpp">
-      <Filter>MyControls</Filter>
-    </ClCompile>
-    <ClCompile Include="ZCommonControls.cpp">
-      <Filter>MyControls</Filter>
-    </ClCompile>
-    <ClCompile Include="ZPaintManager.cpp">
-      <Filter>MyControls</Filter>
-    </ClCompile>
-    <ClCompile Include="ZBase.cpp">
-      <Filter>MyControls</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="WinUI.rc">
+    <ResourceCompile Include="WinUITest.rc">
       <Filter>资源文件</Filter>
     </ResourceCompile>
   </ItemGroup>
@@ -87,7 +48,7 @@
     <Image Include="small.ico">
       <Filter>资源文件</Filter>
     </Image>
-    <Image Include="WinUI.ico">
+    <Image Include="WinUITest.ico">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>

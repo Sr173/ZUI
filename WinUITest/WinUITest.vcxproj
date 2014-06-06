@@ -11,9 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{43DEF742-9147-40F8-BE70-A73B0839B6B2}</ProjectGuid>
+    <ProjectGuid>{04F4F8AD-C2A9-4A4D-8D7B-29B40AD2F9B2}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>WinUI</RootNamespace>
+    <RootNamespace>WinUITest</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -82,32 +82,21 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="WinUI.h" />
-    <ClInclude Include="ZBase.h" />
-    <ClInclude Include="ZCommonControls.h" />
-    <ClInclude Include="ZCommonWnd.h" />
-    <ClInclude Include="ZEvent.h" />
-    <ClInclude Include="ZHead.h" />
-    <ClInclude Include="ZPaintManager.h" />
-    <ClInclude Include="ZUIBase.h" />
+    <ClInclude Include="WinUITest.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="WinUI.cpp" />
-    <ClCompile Include="ZBase.cpp" />
-    <ClCompile Include="ZCommonControls.cpp" />
-    <ClCompile Include="ZCommonWnd.cpp" />
-    <ClCompile Include="ZPaintManager.cpp" />
+    <ClCompile Include="WinUITest.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="WinUI.rc" />
+    <ResourceCompile Include="WinUITest.rc" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="small.ico" />
-    <Image Include="WinUI.ico" />
+    <Image Include="WinUITest.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
