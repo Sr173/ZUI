@@ -102,7 +102,7 @@ namespace ZUI
 		}
 		ZStringW& operator=(const ZStringW& str)
 		{
-			SetNull(false);
+			SetNull(str.IsNull());
 			m_str = str.m_str;
 			return *this;
 		}

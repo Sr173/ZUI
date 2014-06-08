@@ -85,5 +85,16 @@ namespace ZUI
 			}
 		}
 	};
+	typedef LONG(*ControlFunc)(ZUI::ZControl*, void*);
+	class ZControlEvent :
+		public ZEvent < ControlFunc >
+	{
+	public:
+		void Invoke(ZControl* control, void* lpInfo) {
+			for each (auto func in m_funcs) {
+				func(control, lpInfo);
+			}
+		}
+	};
 } //namespace ZUI
 #endif //ZLIB_ZEVENT_HEADER

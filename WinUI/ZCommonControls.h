@@ -28,62 +28,53 @@ namespace ZUI
 		virtual void DrawSelf(HWND owner, ZGdiplusManager* painter, const RECT& rc);
 		virtual void Release();
 	public:
-		ZLabel&		SetText(const ZStringW& text) {
+		void		SetText(const ZStringW& text) {
 			m_text = text;
-			return *this;
 		}
 		ZStringW	GetText() const {
 			return m_text;
 		}
-		ZLabel&		SetTextSize(int size) {
+		void		SetTextSize(int size) {
 			m_fontSize = size;
-			return *this;
 		}
-		ZLabel&		SetTextColor(BYTE r, BYTE g, BYTE b, BYTE a = 255) {
+		void		SetTextColor(BYTE r, BYTE g, BYTE b, BYTE a = 255) {
 			m_fontColor = ZColor(r, g, b, a);
-			return *this;
 		}
-		ZLabel&		SetBackColor(BYTE r, BYTE g, BYTE b, BYTE a = 255) {
+		void		SetBackColor(BYTE r, BYTE g, BYTE b, BYTE a = 255) {
 			m_backColor = ZColor(r, g, b, a);
-
-			return *this;
 		}
-		ZLabel&		SetBorderColor(BYTE r, BYTE g, BYTE b, BYTE a = 255) {
+		void		SetBorderColor(BYTE r, BYTE g, BYTE b, BYTE a = 255) {
 			m_borderColor = ZColor(r, g, b, a);
-			return *this;
 		}
-		ZLabel&		SetRect(RECT rc) {
+		void		SetRect(RECT rc) {
 			m_rc = rc;
-			return *this;
 		}
 		RECT		GetRect() const {
 			return m_rc;
 		}
-		ZLabel&		SetWidth(int width) {
+		void		SetWidth(int width) {
 			m_rc.right = m_rc.left + width;
-			return *this;
 		}
 		int			GetWidth() const {
 			return m_rc.right - m_rc.left;
 		}
-		ZLabel&		SetHeight(int height) {
+		void		SetHeight(int height) {
 			m_rc.bottom = m_rc.top + height;
-			return *this;
 		}
 		int			GetHeight() const {
 			return m_rc.bottom - m_rc.top;
 		}
-		ZLabel&		SetPosition(int x, int y) {
+		void		SetPosition(int x, int y) {
 			m_rc.right = GetWidth() + x;
 			m_rc.bottom = GetHeight() + y;
 			m_rc.left = x;
 			m_rc.top = y;
-			return *this;
 		}
 		void Invalidate()
 		{
-			assert(::IsWindow(m_parent));
-			::InvalidateRect(m_parent, &m_rc, TRUE);
+			if (::IsWindow(m_parent)) {
+				::InvalidateRect(m_parent, &m_rc, TRUE);
+			}
 		}
 	public:
 		//message function
@@ -102,37 +93,9 @@ namespace ZUI
 		void NotifyOnMouseMoveOut(MouseFunc func) {
 			m_mouseMoveOut.subscribe(func);
 		}
-		virtual LONG OnLButtonUp(ZControl* con, ZMouseState s)
-		{
-			if (PointInRect(s.x, s.y, m_rc)) {
-				m_lbuttonUp.Invoke(con, s);
-			}
-			return 0;
-		}
-		virtual LONG OnRButtonUp(ZControl* con, ZMouseState s)
-		{
-			if (PointInRect(s.x, s.y, m_rc)) {
-				m_rbuttonUp.Invoke(con, s);
-			}
-			return 0;
-		}
-		virtual LONG OnMouseMove(ZControl* con, ZMouseState s)
-		{
-			if (PointInRect(s.x, s.y, m_rc)) {
-				if (!m_bMouseIn) {
-					m_bMouseIn = true;
-					m_mouseMoveIn.Invoke(con, s);
-				}
-				m_mouseMove.Invoke(con, s);
-			}
-			else {
-				if (m_bMouseIn) {
-					m_bMouseIn = false;
-					m_mouseMoveOut.Invoke(con, s);
-				}
-			}
-			return 0;
-		}
+		virtual LONG OnLButtonUp(ZControl* con, ZMouseState s);
+		virtual LONG OnRButtonUp(ZControl* con, ZMouseState s);
+		virtual LONG OnMouseMove(ZControl* con, ZMouseState s);
 	protected:
 		ZStringW	m_text;	//Label text
 		int			m_fontSize;
@@ -146,6 +109,58 @@ namespace ZUI
 		ZMouseEvent m_mouseMoveIn;
 		ZMouseEvent m_mouseMoveOut;
 		ZMouseEvent m_rbuttonUp;
+	};
+	class ZButton :
+		public ZLabel
+	{
+	public:
+		ZButton();
+		virtual ~ZButton()
+		{}
+	public:
+		virtual void DrawSelf(HWND owner, ZGdiplusManager* painter, const RECT& _rc);
+	public:
+		void	SetHoverColor(BYTE r, BYTE g, BYTE b, BYTE a = 255) {
+			m_hoverBackColor = ZColor(r, g, b, a);
+		}
+	protected:
+		static LONG OnMouseInEvent(ZControl* con, ZMouseState s);
+		static LONG OnMouseOutEvent(ZControl* con, ZMouseState s);
+	protected:
+		ZColor		m_hoverBackColor;
+		bool		m_bHovered;
+	};
+	class ZTextBox :
+		public ZLabel
+	{
+	public:
+		ZTextBox();
+		virtual ~ZTextBox()
+		{}
+	public:
+		virtual void SetFocus();
+		virtual void LostFocus();
+	public:
+		void NotifyOnGetFocus(ControlFunc func) {
+			m_getFocus.subscribe(func);
+		}
+		void NotifyOnLostFocus(ControlFunc func) {
+			m_lostFocus.subscribe(func);
+		}
+		virtual LONG OnGetFocus() {
+			m_getFocus.Invoke(this, NULL);
+			return 0;
+		}
+		virtual LONG OnLostFocus() {
+			m_lostFocus.Invoke(this, NULL);
+			return 0;
+		}
+		virtual LONG OnLButtonUp(ZControl* con, ZMouseState s);
+	protected:
+		static LONG ClickAndChangeFocus(ZControl* con, ZMouseState s);
+	protected:
+		ZControlEvent	m_lostFocus;
+		ZControlEvent	m_getFocus;
 	};
 }
 

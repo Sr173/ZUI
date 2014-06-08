@@ -14,17 +14,35 @@ namespace ZUI
 	{
 	public:
 		ZControl() :
-			m_parent(NULL)
-		{}
+			m_parent(NULL),
+			m_bFocus(false)
+		{
+			m_id.SetNull(true);
+		}
 		virtual ~ZControl()
 		{}
 	public:
 		virtual void DrawSelf(HWND owner, ZGdiplusManager* painter, const RECT& rc) = 0;
 		virtual void Release() = 0;
 	public:
-		void SetHWND(HWND hwnd)
+		virtual void SetId(LPCTSTR id) {
+			m_id = id;
+		}
+		virtual ZString GetId() const {
+			return m_id;
+		}
+		virtual void SetHWND(HWND hwnd)
 		{
 			m_parent = hwnd;
+		}
+		virtual void SetFocus() {
+			m_bFocus = true;
+		}
+		virtual void LostFocus() {
+			m_bFocus = false;
+		}
+		virtual bool IsFocus() const {
+			return m_bFocus;
 		}
 	public:
 		//message function
@@ -43,6 +61,8 @@ namespace ZUI
 		}
 	protected:
 		HWND		m_parent;
+		ZString		m_id;
+		bool		m_bFocus;
 	};
 
 	template <class WndCls>
@@ -216,8 +236,30 @@ namespace ZUI
 			control->SetHWND(m_hWnd);
 			m_pControls.push_back(control);
 		}
+		bool RemoveControl(ZControl* control) {
+			auto iter = FindControl(control);
+			if (iter == m_pControls.end()) {
+				return false;
+			}
+			else {
+				m_pControls.erase(iter);
+				control->Release();
+				return false;
+			}
+		}
 		void SetPaintManager(ZGdiplusManager* painter) {
 			m_paintManager = painter;
+		}
+	protected:
+		std::vector<ZControl*>::iterator FindControl(ZControl* control)
+		{
+			for (auto iter = m_pControls.begin();
+				iter != m_pControls.end(); ++iter) {
+				if (*iter == control) {
+					return iter;
+				}
+			}
+			return m_pControls.end();
 		}
 	protected:
 		HWND					m_hWnd;
