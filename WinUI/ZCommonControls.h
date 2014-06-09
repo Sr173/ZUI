@@ -26,6 +26,7 @@ namespace ZUI
 	public:
 		//ZControl methods
 		virtual void DrawSelf(HWND owner, ZGdiplusManager* painter, const RECT& rc);
+		virtual void HandleEvent(const ZControlMsg& msg);
 		virtual void Release();
 	public:
 		void		SetText(const ZStringW& text) {
@@ -140,6 +141,7 @@ namespace ZUI
 	public:
 		virtual void SetFocus();
 		virtual void LostFocus();
+		virtual void HandleEvent(const ZControlMsg& msg);
 	public:
 		void NotifyOnGetFocus(ControlFunc func) {
 			m_getFocus.subscribe(func);
@@ -155,6 +157,7 @@ namespace ZUI
 			m_lostFocus.Invoke(this, NULL);
 			return 0;
 		}
+		virtual LONG OnIMEInput(const ZControlMsg& msg);
 		virtual LONG OnLButtonUp(ZControl* con, ZMouseState s);
 	protected:
 		static LONG ClickAndChangeFocus(ZControl* con, ZMouseState s);

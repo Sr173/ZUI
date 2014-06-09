@@ -3,3 +3,4 @@
 #include <assert.h>
 void ZEventTest();
 void ZFuncTest();
+void ZTypeTest();

@@ -5,6 +5,7 @@
 #include <gdiplus.h>
 using namespace Gdiplus;
 #pragma comment(lib, "Gdiplus.lib")
+#pragma comment(lib, "Imm32.lib")
 #include <assert.h>
 namespace ZUI
 {
@@ -42,6 +43,23 @@ namespace ZUI
 				static_cast<Gdiplus::REAL>(m_fontSize),
 				Gdiplus::FontStyleRegular, Gdiplus::UnitPixel);
 			graphics.DrawString(m_text, -1, &font, rc, &fontFormat, &fontBrush);
+		}
+	}
+	void ZLabel::HandleEvent(const ZControlMsg& msg)
+	{
+		ZMouseState mouseState(msg.wParam, msg.lParam);
+		switch (msg.uMsg)
+		{
+		case WM_LBUTTONUP:
+			OnLButtonUp(this, mouseState);
+			break;
+		case WM_RBUTTONUP:
+			OnRButtonUp(this, mouseState);
+			break;
+		case WM_MOUSEMOVE:
+			OnMouseMove(this, mouseState);
+		default:
+			break;
 		}
 	}
 	void ZLabel::Release()
@@ -120,6 +138,7 @@ namespace ZUI
 	{
 		SetTextColor(0, 0, 0, 255);
 		SetBackColor(255, 255, 255, 255);
+		SetWidth(200);
 		NotifyOnLButtonUp(ClickAndChangeFocus);
 	}
 	void ZTextBox::SetFocus()
@@ -135,6 +154,57 @@ namespace ZUI
 			m_bFocus = false;
 			OnLostFocus();
 		}
+	}
+	void ZTextBox::HandleEvent(const ZControlMsg& msg)
+	{
+
+		WCHAR keyChar;
+		switch (msg.uMsg)
+		{
+		case WM_IME_COMPOSITION:
+			OnIMEInput(msg);
+			break;
+		case WM_CHAR:
+			if (IsFocus()) {
+				if (msg.lParam & (1 << 24)) break;
+
+				keyChar = static_cast<WCHAR>(msg.wParam);
+				ZStringW conText = GetText();
+				conText.Append(keyChar);
+				SetText(conText);
+				Invalidate();
+			}
+			break;
+		default:
+			ZLabel::HandleEvent(msg);
+			break;
+		}
+	}
+	LONG ZTextBox::OnIMEInput(const ZControlMsg& msg)
+	{
+		HIMC hIMC;
+		DWORD dwSize;
+		LPWSTR lpstr;
+		if (IsFocus()) {
+			if (msg.lParam & GCS_RESULTSTR)
+			{
+				hIMC = ImmGetContext(msg.hWnd);
+				dwSize = ImmGetCompositionString(
+					hIMC, GCS_RESULTSTR, NULL, 0);
+				dwSize += sizeof(WCHAR);
+				lpstr = new WCHAR[dwSize];
+				ImmGetCompositionString(
+					hIMC, GCS_RESULTSTR, lpstr, dwSize);
+				ImmReleaseContext(msg.hWnd, hIMC);
+				lpstr[dwSize / sizeof(_TCHAR)-1] = 0;
+				ZStringW conText = GetText();
+				conText.Append(lpstr);
+				delete[] lpstr;
+				SetText(conText);
+				Invalidate();
+			}
+		}
+		return 0;
 	}
 	LONG ZTextBox::OnLButtonUp(ZControl* con, ZMouseState s)
 	{

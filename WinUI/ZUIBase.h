@@ -9,6 +9,24 @@
 #include <assert.h>
 namespace ZUI
 {
+	typedef struct {
+		HWND	hWnd;
+		UINT	uMsg;
+		WPARAM	wParam;
+		LPARAM	lParam;
+		bool	bHandled;
+	}ZControlMsg, *pZControlMsg;
+	inline ZControlMsg MakeZControlMsg(HWND hWnd, UINT uMsg,
+		WPARAM wParam, LPARAM lParam, bool bHandled = false)
+	{
+		ZControlMsg controlMsg;
+		controlMsg.hWnd = hWnd; 
+		controlMsg.uMsg = uMsg;
+		controlMsg.wParam = wParam;
+		controlMsg.lParam = lParam;
+		controlMsg.bHandled = bHandled;
+		return controlMsg;
+	}
 	class ZControl :
 		public ZObject
 	{
@@ -23,6 +41,7 @@ namespace ZUI
 		{}
 	public:
 		virtual void DrawSelf(HWND owner, ZGdiplusManager* painter, const RECT& rc) = 0;
+		virtual void HandleEvent(const ZControlMsg& msg) = 0;
 		virtual void Release() = 0;
 	public:
 		virtual void SetId(LPCTSTR id) {
@@ -159,7 +178,9 @@ namespace ZUI
 				pThis = reinterpret_cast<WndCls*>(::GetWindowLong(hWnd, GWLP_USERDATA));
 			}
 			if (pThis != NULL) {
-				pThis->PreHandleMessage(hWnd, uMsg, wParam, lParam);
+				ZControlMsg controlMsg = MakeZControlMsg(
+					hWnd, uMsg, wParam, lParam, false);
+				pThis->PreHandleMessage(controlMsg);
 				
 				if (uMsg != WM_PAINT) {
 					//user shouldn't paint
@@ -168,26 +189,32 @@ namespace ZUI
 					lret = pThis->HandleMessage(hWnd, uMsg, wParam, lParam);
 				}
 				pThis->FinalHandleMessage(hWnd, uMsg, wParam, lParam);
+				/*
+				if (!controlMsg.bHandled) {
+					lret = DefWindowProc(hWnd, uMsg, wParam, lParam);
+				}
+				*/
 			}
 			else {
 				lret = DefWindowProc(hWnd, uMsg, wParam, lParam);
 			}
 			return lret;
 		}
-		bool PreHandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+		bool PreHandleMessage(ZControlMsg& msg)
 		{
 			ZMouseState s;
 			PAINTSTRUCT ps;
-			switch (uMsg)
+			switch (msg.uMsg)
 			{
 			case WM_PAINT:
-				::BeginPaint(hWnd, &ps);
-				::EndPaint(hWnd, &ps);
+				::BeginPaint(msg.hWnd, &ps);
+				::EndPaint(msg.hWnd, &ps);
 				DrawMySelf(ps.rcPaint);
 				break;
-			case WM_MOUSEMOVE:
-				break;
 			default:
+				for each (auto control in m_pControls) {
+					control->HandleEvent(msg);
+				}
 				break;
 			}
 			return true;
@@ -197,23 +224,9 @@ namespace ZUI
 			ZMouseState s;
 			switch (uMsg)
 			{
-			case WM_LBUTTONUP:
-				s = ZMouseState(wParam, lParam);
-				for each (auto control in m_pControls) {
-					control->OnLButtonUp(control, s);
-				}
-				break;
-			case WM_RBUTTONUP:
-				s = ZMouseState(wParam, lParam);
-				for each (auto control in m_pControls) {
-					control->OnRButtonUp(control, s);
-				}
-				break;
+
 			case WM_MOUSEMOVE:
-				s = ZMouseState(wParam, lParam);
-				for each (auto control in m_pControls) {
-					control->OnMouseMove(control, s);
-				}
+				break;
 			default:
 				break;
 			}

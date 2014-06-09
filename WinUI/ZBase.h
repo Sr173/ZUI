@@ -28,6 +28,9 @@ namespace ZUI
 		public ZObject
 	{
 	public:
+		ZNullable() :
+			m_bNull(true)
+		{}
 		ZNullable(bool bNull) :
 			m_bNull(bNull)
 		{}
@@ -49,22 +52,33 @@ namespace ZUI
 	{
 	public:
 		ZStringA() :
-			ZNullable(true)
+			ZNullable(true), m_buffer(nullptr), m_length(0)
 		{}
 		ZStringA(const char* str) :
-			ZNullable(false), m_str(str)
-		{}
+			ZNullable(false)
+		{
+			m_length = strlen(str);
+			m_buffer = new char[m_length + 1];
+			strcpy_s(m_buffer, m_length + 1, str);
+		}
 		~ZStringA()
-		{}
+		{
+			Clear();
+		}
 		ZStringA(const ZStringA& str) :
-			ZNullable(str.IsNull())
+			ZNullable(true)
 		{
 			*this = str;
 		}
 		ZStringA& operator=(const ZStringA& str)
 		{
 			SetNull(str.IsNull());
-			m_str = str.m_str;
+			if (!IsNull()) {
+				m_length = str.Length();
+				m_buffer = new char[m_length + 1];
+				strcpy_s(m_buffer, m_length + 1, str.m_buffer);
+			}
+			return *this;
 		}
 		bool operator==(const ZStringA& str)
 		{
@@ -74,36 +88,99 @@ namespace ZUI
 			if (IsNull() || str.IsNull()) {
 				return false;
 			}
-			return m_str == str.m_str;
+			return (!strcmp(m_buffer, str.m_buffer));
+		}
+		bool operator!=(const ZStringA& str)
+		{
+			return !(*this == str);
+		}
+		ZStringA& operator+=(const ZStringA& str)
+		{
+			Append(str);
+			return *this;
+		}
+		ZStringA operator+(const ZStringA& str)
+		{
+			ZStringA tmpStr = *this;
+			tmpStr += str;
+			return tmpStr;
 		}
 	public:
-		operator const char*() {
-			return m_str.c_str();
+		void Clear()
+		{
+			if (m_buffer != nullptr) {
+				delete[] m_buffer;
+				m_buffer = nullptr;
+			}
+			SetNull(true);
+			m_length = 0;
+		}
+		unsigned long Length() const {
+			return m_length;
+		}
+		operator const char*()
+		{
+			return m_buffer;
+		}
+		unsigned long Append(const ZStringA& str)
+		{
+			return Append(str.m_buffer);
+		}
+		unsigned long Append(const char* str)
+		{
+			int length = m_length + strlen(str);
+			char* newBuffer = new char[length + 1];
+			newBuffer[0] = 0;
+			if (!IsNull()) {
+				strcpy_s(newBuffer, length + 1, m_buffer);
+			}
+			strcat_s(newBuffer, length + 1, str);
+			Clear();
+			m_buffer = newBuffer;
+			m_length = length;
+			SetNull(false);
+			return m_length;
+		}
+		unsigned long Append(char c)
+		{
+			char tmpStr[] = { c, 0 };
+			return Append(tmpStr);
 		}
 	private:
-		std::string m_str;
+		char*		m_buffer;
+		unsigned long	m_length;
 	};
 	class ZStringW :
 		public ZNullable
 	{
 	public:
 		ZStringW() :
-			ZNullable(true)
+			ZNullable(true), m_buffer(nullptr), m_length(0)
 		{}
 		ZStringW(const wchar_t* str) :
-			ZNullable(false), m_str(str)
-		{}
+			ZNullable(false)
+		{
+			m_length = wcslen(str);
+			m_buffer = new wchar_t[m_length + 1];
+			wcscpy_s(m_buffer, m_length + 1, str);
+		}
 		~ZStringW()
-		{}
+		{
+			Clear();
+		}
 		ZStringW(const ZStringW& str) :
-			ZNullable(str.IsNull())
+			ZNullable(true)
 		{
 			*this = str;
 		}
 		ZStringW& operator=(const ZStringW& str)
 		{
 			SetNull(str.IsNull());
-			m_str = str.m_str;
+			if (!IsNull()) {
+				m_length = str.Length();
+				m_buffer = new wchar_t[m_length + 1];
+				wcscpy_s(m_buffer, m_length + 1, str.m_buffer);
+			}
 			return *this;
 		}
 		bool operator==(const ZStringW& str)
@@ -114,15 +191,67 @@ namespace ZUI
 			if (IsNull() || str.IsNull()) {
 				return false;
 			}
-			return m_str == str.m_str;
+			return (!wcscmp(m_buffer, str.m_buffer));
+		}
+		bool operator!=(const ZStringW& str)
+		{
+			return !(*this == str);
+		}
+		ZStringW& operator+=(const ZStringW& str)
+		{
+			Append(str);
+			return *this;
+		}
+		ZStringW operator+(const ZStringW& str)
+		{
+			ZStringW tmpStr = *this;
+			tmpStr += str;
+			return tmpStr;
 		}
 	public:
+		void Clear()
+		{
+			if (m_buffer != nullptr) {
+				delete[] m_buffer;
+				m_buffer = nullptr;
+			}
+			SetNull(true);
+			m_length = 0;
+		}
+		unsigned long Length() const {
+			return m_length;
+		}
 		operator const wchar_t*()
 		{
-			return m_str.c_str();
+			return m_buffer;
+		}
+		unsigned long Append(const ZStringW& str)
+		{
+			return Append(str.m_buffer);
+		}
+		unsigned long Append(const wchar_t* str)
+		{
+			int length = m_length + wcslen(str);
+			wchar_t* newBuffer = new wchar_t[length + 1];
+			newBuffer[0] = 0;
+			if (!IsNull()) {
+				wcscpy_s(newBuffer, length + 1, m_buffer);
+			}
+			wcscat_s(newBuffer, length + 1, str);
+			Clear();
+			m_buffer = newBuffer;
+			m_length = length;
+			SetNull(false);
+			return m_length;
+		}
+		unsigned long Append(wchar_t c)
+		{
+			wchar_t tmpStr[] = { c , 0 };
+			return Append(tmpStr);
 		}
 	private:
-		std::wstring m_str;
+		wchar_t*		m_buffer;
+		unsigned long	m_length;
 	};
 #ifndef UNICODE
 	typedef ZStringA ZString;
