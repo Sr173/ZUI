@@ -10,53 +10,33 @@ using namespace Gdiplus;
 namespace ZUI
 {
 	//ZLabel begin
-	void ZLabel::DrawSelf(HWND owner, ZGdiplusManager* painter, const RECT& _rc)
+	void ZLabel::DrawSelf(HWND owner, ZRender* render, const RECT& _rc)
 	{
 		assert(IsWindow(owner));
-		if (!IsRectCross(_rc, m_rc)) return;
-		Gdiplus::Graphics				graphics(owner);
-		Gdiplus::Color backColor =		ZColor2GdiColor(m_backColor);
-		Gdiplus::Color fontColor =		ZColor2GdiColor(m_fontColor);
-		Gdiplus::Color borderColor =	ZColor2GdiColor(m_borderColor);
-		Gdiplus::SolidBrush				backBrush(backColor);
-		Gdiplus::Pen					borderPen(borderColor);
-		Gdiplus::SolidBrush				fontBrush(fontColor);
-
-		Gdiplus::RectF rc(static_cast<float>(m_rc.left), 
-			static_cast<float>(m_rc.top),
-			static_cast<float>(m_rc.right - m_rc.left),
-			static_cast<float>(m_rc.bottom - m_rc.top));
-		
-		graphics.FillRectangle(&backBrush, rc);
-		graphics.DrawRectangle(&borderPen, rc);
+		//if (!IsRectCross(_rc, m_rc)) return;
+		//ZRender* render = painter->CreateRender(owner, m_rc);
+		if (render == nullptr) return;
+		render->FillRectangle(m_rc, m_backColor);
+		render->DrawRectangle(m_rc, m_borderColor);
 		if (!m_text.IsNull()) {
-			/*
-			float fontx = static_cast<float>((m_rc.left + m_rc.right) / 2 );
-			float fonty = static_cast<float>((m_rc.top + m_rc.bottom) / 2);
-			Gdiplus::PointF fontPt(fontx, fonty);
-			*/
-			StringFormat fontFormat;
-			fontFormat.SetAlignment(Gdiplus::StringAlignment::StringAlignmentCenter);
-			fontFormat.SetLineAlignment(Gdiplus::StringAlignment::StringAlignmentCenter);
-			FontFamily fontFamily(L"Times New Roman");
-			Font font(&fontFamily,
-				static_cast<Gdiplus::REAL>(m_fontSize),
-				Gdiplus::FontStyleRegular, Gdiplus::UnitPixel);
-			graphics.DrawString(m_text, -1, &font, rc, &fontFormat, &fontBrush);
+			render->PaintText(m_rc, m_text, m_fontSize, m_fontColor, ZRender::TAMMiddle, ZRender::TAMMiddle);
 		}
 	}
-	void ZLabel::HandleEvent(const ZControlMsg& msg)
+	void ZLabel::HandleEvent(ZControlMsg& msg)
 	{
 		ZMouseState mouseState(msg.wParam, msg.lParam);
 		switch (msg.uMsg)
 		{
 		case WM_LBUTTONUP:
+			msg.bHandled = true;
 			OnLButtonUp(this, mouseState);
 			break;
 		case WM_RBUTTONUP:
+			msg.bHandled = true;
 			OnRButtonUp(this, mouseState);
 			break;
 		case WM_MOUSEMOVE:
+			msg.bHandled = true;
 			OnMouseMove(this, mouseState);
 		default:
 			break;
@@ -108,13 +88,13 @@ namespace ZUI
 		NotifyOnMouseMoveIn(ZButton::OnMouseInEvent);
 		NotifyOnMouseMoveOut(ZButton::OnMouseOutEvent);
 	}
-	void ZButton::DrawSelf(HWND owner, ZGdiplusManager* painter, const RECT& _rc)
+	void ZButton::DrawSelf(HWND owner, ZRender* render, const RECT& _rc)
 	{
 		ZColor tmpColor = m_backColor;
 		if (m_bHovered) {
 			m_backColor = m_hoverBackColor;
 		}
-		ZLabel::DrawSelf(owner, painter, _rc);
+		ZLabel::DrawSelf(owner, render, _rc);
 		m_backColor = tmpColor;
 	}
 	LONG ZButton::OnMouseInEvent(ZControl* con, ZMouseState s)
@@ -155,32 +135,22 @@ namespace ZUI
 			OnLostFocus();
 		}
 	}
-	void ZTextBox::HandleEvent(const ZControlMsg& msg)
+	void ZTextBox::HandleEvent(ZControlMsg& msg)
 	{
-
-		WCHAR keyChar;
 		switch (msg.uMsg)
 		{
 		case WM_IME_COMPOSITION:
 			OnIMEInput(msg);
 			break;
 		case WM_CHAR:
-			if (IsFocus()) {
-				if (msg.lParam & (1 << 24)) break;
-
-				keyChar = static_cast<WCHAR>(msg.wParam);
-				ZStringW conText = GetText();
-				conText.Append(keyChar);
-				SetText(conText);
-				Invalidate();
-			}
+			OnCharInput(msg);
 			break;
 		default:
 			ZLabel::HandleEvent(msg);
 			break;
 		}
 	}
-	LONG ZTextBox::OnIMEInput(const ZControlMsg& msg)
+	LONG ZTextBox::OnIMEInput(ZControlMsg& msg)
 	{
 		HIMC hIMC;
 		DWORD dwSize;
@@ -202,7 +172,22 @@ namespace ZUI
 				delete[] lpstr;
 				SetText(conText);
 				Invalidate();
+				msg.bHandled = true;
 			}
+		}
+		return 0;
+	}
+	LONG ZTextBox::OnCharInput(ZControlMsg& msg)
+	{
+		WCHAR keyChar;
+		if (IsFocus()) {
+			if (msg.lParam & (1 << 24)) return -1;
+			keyChar = static_cast<WCHAR>(msg.wParam);
+			ZStringW conText = GetText();
+			conText.Append(keyChar);
+			SetText(conText);
+			Invalidate();
+			msg.bHandled = true;
 		}
 		return 0;
 	}

@@ -9,13 +9,14 @@
 #include <assert.h>
 namespace ZUI
 {
+	//Msg Struct
 	typedef struct {
 		HWND	hWnd;
 		UINT	uMsg;
 		WPARAM	wParam;
 		LPARAM	lParam;
 		bool	bHandled;
-	}ZControlMsg, *pZControlMsg;
+	} ZControlMsg, *pZControlMsg;
 	inline ZControlMsg MakeZControlMsg(HWND hWnd, UINT uMsg,
 		WPARAM wParam, LPARAM lParam, bool bHandled = false)
 	{
@@ -27,6 +28,12 @@ namespace ZUI
 		controlMsg.bHandled = bHandled;
 		return controlMsg;
 	}
+	//ZUI Message Define
+	enum
+	{
+		ZUIM_PAINT = WM_USER + 100,
+
+	};
 	class ZControl :
 		public ZObject
 	{
@@ -40,8 +47,8 @@ namespace ZUI
 		virtual ~ZControl()
 		{}
 	public:
-		virtual void DrawSelf(HWND owner, ZGdiplusManager* painter, const RECT& rc) = 0;
-		virtual void HandleEvent(const ZControlMsg& msg) = 0;
+		virtual void DrawSelf(HWND owner, ZRender* render, const RECT& rc) = 0;
+		virtual void HandleEvent(ZControlMsg& msg) = 0;
 		virtual void Release() = 0;
 	public:
 		virtual void SetId(LPCTSTR id) {
@@ -186,14 +193,13 @@ namespace ZUI
 					//user shouldn't paint
 					//to do 
 					//封装一个消息给用户处理
-					lret = pThis->HandleMessage(hWnd, uMsg, wParam, lParam);
+					//lret = pThis->HandleMessage(hWnd, uMsg, wParam, lParam);
 				}
-				pThis->FinalHandleMessage(hWnd, uMsg, wParam, lParam);
-				/*
+				pThis->FinalHandleMessage(controlMsg);
+				
 				if (!controlMsg.bHandled) {
 					lret = DefWindowProc(hWnd, uMsg, wParam, lParam);
 				}
-				*/
 			}
 			else {
 				lret = DefWindowProc(hWnd, uMsg, wParam, lParam);
@@ -208,9 +214,16 @@ namespace ZUI
 			{
 			case WM_PAINT:
 				::BeginPaint(msg.hWnd, &ps);
-				::EndPaint(msg.hWnd, &ps);
 				DrawMySelf(ps.rcPaint);
+				::EndPaint(msg.hWnd, &ps);
+				msg.uMsg = ZUIM_PAINT;
+				msg.bHandled = true;
 				break;
+			case WM_SIZE:
+				m_paintManager->Invalidate();
+				break;
+			case WM_MOVE:
+				m_paintManager->Invalidate();
 			default:
 				for each (auto control in m_pControls) {
 					control->HandleEvent(msg);
@@ -219,13 +232,14 @@ namespace ZUI
 			}
 			return true;
 		}
-		bool FinalHandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+		bool FinalHandleMessage(ZControlMsg& msg)
 		{
 			ZMouseState s;
-			switch (uMsg)
+			switch (msg.uMsg)
 			{
-
-			case WM_MOUSEMOVE:
+			case WM_DESTROY:
+				msg.bHandled = true;
+				::PostQuitMessage(0);
 				break;
 			default:
 				break;
@@ -239,9 +253,10 @@ namespace ZUI
 		}
 		void DrawMySelf(const RECT& rc) {
 			assert(m_paintManager != NULL);
+			ZRender* render = m_paintManager->GetRender();
 			for each (auto control in m_pControls)
 			{
-				control->DrawSelf(m_hWnd, m_paintManager, rc);
+				control->DrawSelf(m_hWnd, render, rc);
 			}
 		}
 		void AddControl(ZControl* control) {
@@ -260,7 +275,7 @@ namespace ZUI
 				return false;
 			}
 		}
-		void SetPaintManager(ZGdiplusManager* painter) {
+		void SetPaintManager(ZPaintManager* painter) {
 			m_paintManager = painter;
 		}
 	protected:
@@ -278,7 +293,7 @@ namespace ZUI
 		HWND					m_hWnd;
 	private:
 		std::vector<ZControl*>	m_pControls;
-		ZGdiplusManager*		m_paintManager;
+		ZPaintManager*		m_paintManager;
 	};
 }
 #endif //ZUI_ZUIBASE_HEADER

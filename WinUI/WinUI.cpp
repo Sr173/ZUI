@@ -89,7 +89,7 @@ LONG BeClick(ZUI::ZControl* con, ZUI::ZMouseState s)
 {
 	ZUI::ZLabel* label = dynamic_cast<ZUI::ZLabel*>(con);
 	ZUI::ZString str = label->GetText();
-	::MessageBox(NULL, str, _T("Label Click"), 0);
+	::MessageBox(NULL, str.c_str(), _T("Label Click"), 0);
 	return 0;
 }
 LONG RClick(ZUI::ZControl* con, ZUI::ZMouseState s)
@@ -126,9 +126,12 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
                      _In_ LPTSTR    lpCmdLine,
                      _In_ int       nCmdShow)
 {
-	ZUI::ZGdiplusManager *paintManager = new ZUI::ZGdiplusManager();
+	ZUI::ZPaintManager *paintManager = new ZUI::ZPaintManager();
 	HelloWindow* hellowindow = new HelloWindow();
 	hellowindow->SetPaintManager(paintManager);
+
+	//paintManager->Setup(_T("direct2d"));
+	paintManager->Setup(_T("gdiplus"));
 	ZUI::ZLabel* label = new ZUI::ZLabel();
 	label->SetPosition(100, 100);
 	label->SetWidth(200);
@@ -180,7 +183,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	textbox->NotifyOnLostFocus(LostFocus);
 	hellowindow->AddControl(textbox);
 
-	ZUI::ZGdiplusManager::MessageLoop();
+	ZUI::ZPaintManager::MessageLoop();
 	paintManager->Release();
 	return 0;
 }

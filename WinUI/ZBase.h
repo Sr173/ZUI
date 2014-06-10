@@ -80,7 +80,7 @@ namespace ZUI
 			}
 			return *this;
 		}
-		bool operator==(const ZStringA& str)
+		bool operator==(const ZStringA& str) const
 		{
 			if (IsNull() && str.IsNull()) {
 				return true;
@@ -90,7 +90,7 @@ namespace ZUI
 			}
 			return (!strcmp(m_buffer, str.m_buffer));
 		}
-		bool operator!=(const ZStringA& str)
+		bool operator!=(const ZStringA& str) const
 		{
 			return !(*this == str);
 		}
@@ -118,7 +118,7 @@ namespace ZUI
 		unsigned long Length() const {
 			return m_length;
 		}
-		operator const char*()
+		const char* c_str()
 		{
 			return m_buffer;
 		}
@@ -145,6 +145,19 @@ namespace ZUI
 		{
 			char tmpStr[] = { c, 0 };
 			return Append(tmpStr);
+		}
+		ZStringA ToLower() const
+		{
+			ZStringA lowerStr(*this);
+			unsigned long len = Length();
+			for (unsigned long i = 0; i < len; ++i)
+			{
+				if (m_buffer[i] <= 'Z'
+					&& m_buffer[i] >= 'A') {
+					m_buffer[i] -= ('A' - 'a');
+				}
+			}
+			return lowerStr;
 		}
 	private:
 		char*		m_buffer;
@@ -183,7 +196,7 @@ namespace ZUI
 			}
 			return *this;
 		}
-		bool operator==(const ZStringW& str)
+		bool operator==(const ZStringW& str) const
 		{
 			if (IsNull() && str.IsNull()) {
 				return true;
@@ -193,7 +206,7 @@ namespace ZUI
 			}
 			return (!wcscmp(m_buffer, str.m_buffer));
 		}
-		bool operator!=(const ZStringW& str)
+		bool operator!=(const ZStringW& str) const
 		{
 			return !(*this == str);
 		}
@@ -221,7 +234,7 @@ namespace ZUI
 		unsigned long Length() const {
 			return m_length;
 		}
-		operator const wchar_t*()
+		const wchar_t* c_str()
 		{
 			return m_buffer;
 		}
@@ -248,6 +261,19 @@ namespace ZUI
 		{
 			wchar_t tmpStr[] = { c , 0 };
 			return Append(tmpStr);
+		}
+		ZStringW ToLower() const
+		{
+			ZStringW lowerStr(*this);
+			unsigned long len = Length();
+			for (unsigned long i = 0; i < len; ++i)
+			{
+				if (m_buffer[i] <= L'Z'
+					&& m_buffer[i] >= L'A') {
+					m_buffer[i] -= (L'A' - L'a');
+				}
+			}
+			return lowerStr;
 		}
 	private:
 		wchar_t*		m_buffer;
