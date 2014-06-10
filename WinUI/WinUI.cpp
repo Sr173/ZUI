@@ -127,11 +127,11 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
                      _In_ int       nCmdShow)
 {
 	ZUI::ZPaintManager *paintManager = new ZUI::ZPaintManager();
+	paintManager->Setup(_T("direct2d"));
 	HelloWindow* hellowindow = new HelloWindow();
 	hellowindow->SetPaintManager(paintManager);
 
-	//paintManager->Setup(_T("direct2d"));
-	paintManager->Setup(_T("gdiplus"));
+	//paintManager->Setup(_T("gdiplus"));
 	ZUI::ZLabel* label = new ZUI::ZLabel();
 	label->SetPosition(100, 100);
 	label->SetWidth(200);
@@ -158,7 +158,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	ZUI::ZButton* button1 = new ZUI::ZButton();
 	button1->SetPosition(50, 200);
 	//button1->SetWidth(100);
-	button1->SetHoverColor(255, 0, 0, 127);
+	button1->SetHoverColor(0xff, 0x00, 0xff, 127);
 	button1->SetText(L"²âÊÔ°´Å¥");
 	button1->SetBackColor(0x66, 0xcc, 0xff, 255);
 	button1->NotifyOnLButtonUp(BeClick);
@@ -169,7 +169,9 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	hellowindow->RemoveControl(label2);
 	//hellowindow->AddControl(label1);
 	ZUI::ZCommonWnd::CmnMsgWnd* msgwindow = new ZUI::ZCommonWnd::CmnMsgWnd();
-	msgwindow->SetPaintManager(paintManager);
+	ZUI::ZPaintManager* paintManager1 = new ZUI::ZPaintManager();
+	paintManager1->Setup(_T("gdiplus"));
+	msgwindow->SetPaintManager(paintManager1);
 	msgwindow->AddControl(label1);
 	msgwindow->Create(L"hihi", 300, 200, NULL/*, hellowindow->GetHWND()*/);
 	msgwindow->SetText(L"Hi, World!");
@@ -179,8 +181,12 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	
 	ZUI::ZTextBox* textbox = new ZUI::ZTextBox();
 	textbox->SetPosition(50, 250);
+	textbox->SetHeight(50);
+	textbox->SetTextSize(24);
+	/*
 	textbox->NotifyOnGetFocus(GetFocus);
 	textbox->NotifyOnLostFocus(LostFocus);
+	*/
 	hellowindow->AddControl(textbox);
 
 	ZUI::ZPaintManager::MessageLoop();

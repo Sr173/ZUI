@@ -13,9 +13,9 @@ namespace ZUI
 	void ZLabel::DrawSelf(HWND owner, ZRender* render, const RECT& _rc)
 	{
 		assert(IsWindow(owner));
-		//if (!IsRectCross(_rc, m_rc)) return;
-		//ZRender* render = painter->CreateRender(owner, m_rc);
 		if (render == nullptr) return;
+		if (!IsRectCross(_rc, m_rc)) return;
+		//ZRender* render = painter->CreateRender(owner, m_rc);
 		render->FillRectangle(m_rc, m_backColor);
 		render->DrawRectangle(m_rc, m_borderColor);
 		if (!m_text.IsNull()) {

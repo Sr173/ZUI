@@ -97,14 +97,20 @@ namespace ZUI
 	{
 	public:
 		ZWinBase() :
-			m_hWnd(NULL),
-			m_paintManager(NULL)
+			m_hWnd(nullptr),
+			m_paintManager(nullptr),
+			m_render(nullptr),
+			m_backColor(255,255,255),
+			m_bRefreshRender(true)
 		{}
 		virtual ~ZWinBase()
 		{
 			for each (auto control in m_pControls)
 			{
 				control->Release();
+			}
+			if (m_render != nullptr) {
+				m_render->Release();
 			}
 		}
 	public:
@@ -133,6 +139,7 @@ namespace ZUI
 				dwExStyle, ClassName(), lpWindowName, dwStyle, x, y,
 				nWidth, nHeight, hWndParent, hMenu, GetModuleHandle(NULL), this
 				);
+			m_render = GetRender();
 			if (m_hWnd) {
 				for each (auto control in m_pControls) {
 					control->SetHWND(m_hWnd);
@@ -220,10 +227,11 @@ namespace ZUI
 				msg.bHandled = true;
 				break;
 			case WM_SIZE:
-				m_paintManager->Invalidate();
+				RefreshRender();
+				Invalidate();
 				break;
 			case WM_MOVE:
-				m_paintManager->Invalidate();
+				break;
 			default:
 				for each (auto control in m_pControls) {
 					control->HandleEvent(msg);
@@ -253,7 +261,8 @@ namespace ZUI
 		}
 		void DrawMySelf(const RECT& rc) {
 			assert(m_paintManager != NULL);
-			ZRender* render = m_paintManager->GetRender();
+			ZRender* render = GetRender();
+			render->FillRectangle(rc, m_backColor);
 			for each (auto control in m_pControls)
 			{
 				control->DrawSelf(m_hWnd, render, rc);
@@ -279,6 +288,22 @@ namespace ZUI
 			m_paintManager = painter;
 		}
 	protected:
+		void RefreshRender()
+		{
+			m_bRefreshRender = true;
+		}
+		ZRender* GetRender()
+		{
+			if (m_bRefreshRender) {
+				if (m_render != nullptr) {
+					m_render->Release();
+				}
+				m_render = m_paintManager->CreateRender(m_hWnd);
+				m_render->Clear(m_backColor);
+				m_bRefreshRender = false;
+			}
+			return m_render;
+		}
 		std::vector<ZControl*>::iterator FindControl(ZControl* control)
 		{
 			for (auto iter = m_pControls.begin();
@@ -293,7 +318,10 @@ namespace ZUI
 		HWND					m_hWnd;
 	private:
 		std::vector<ZControl*>	m_pControls;
-		ZPaintManager*		m_paintManager;
+		ZPaintManager*			m_paintManager;
+		ZRender*				m_render;
+		bool					m_bRefreshRender;
+		ZColor					m_backColor;
 	};
 }
 #endif //ZUI_ZUIBASE_HEADER

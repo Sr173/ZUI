@@ -5,6 +5,12 @@
 #include <ObjIdl.h>
 #include <gdiplus.h>
 #pragma comment(lib, "Gdiplus.lib")
+
+#include <atlbase.h>
+#include <d2d1.h>
+#pragma comment(lib, "d2d1.lib")
+#include <dwrite.h>
+#pragma comment(lib, "dwrite.lib")
 namespace ZUI
 {
 	class ZRender :
@@ -43,8 +49,7 @@ namespace ZUI
 
 	public:
 		ZPaintManager() :
-			m_mode(RMNoRender),
-			m_render(nullptr)
+			m_mode(RMNoRender)
 		{
 		}
 		~ZPaintManager()
@@ -59,30 +64,9 @@ namespace ZUI
 		bool Setup(ZString engine);
 		bool Setup(RenderMode mode) {
 			m_mode = mode;
-			ResouceInit();
-			m_render = CreateRender();
-			if (m_render != nullptr) {
-				return true;
-			}
-			else {
-				return false;
-			}
+			return ResouceInit();
 		}
-		ZRender* GetRender()
-		{
-			return m_render;
-		}
-		void Invalidate()
-		{
-			if (m_render != nullptr) {
-				m_render->Release();
-			}
-			m_render = CreateRender();
-		}
-		void SetHWND(HWND hWnd) {
-			m_hWnd = hWnd;
-			Invalidate();
-		}
+		ZRender* CreateRender(HWND hWnd);
 	public:
 		static int MessageLoop()
 		{
@@ -96,7 +80,6 @@ namespace ZUI
 		}
 	private:
 		bool ResouceInit();
-		ZRender* CreateRender();
 		void Clear();
 	private:
 		//Gdi+ method
@@ -108,12 +91,13 @@ namespace ZUI
 		ZRender* CreateDirectRender(HWND hWnd);
 		void DX2DClear();
 	private:
-		HWND							m_hWnd;
 		RenderMode						m_mode;
-		ZRender*						m_render;
 		//gdi+ resource
 		Gdiplus::GdiplusStartupInput	gdiplusStartupInput;
 		ULONG_PTR						gdiplusToken;
+		//direct2d resource
+		CComPtr<ID2D1Factory>			m_pD2DFactory;
+		CComPtr<IDWriteFactory>			m_pDWriteFactory;
 	};
 	inline Gdiplus::Color ZColor2GdiColor(const ZColor& color)
 	{

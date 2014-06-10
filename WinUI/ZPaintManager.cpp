@@ -1,11 +1,7 @@
 #include "stdafx.h"
 #include "ZPaintManager.h"
 #include <assert.h>
-#include <atlbase.h>
-#include <d2d1.h>
-#pragma comment(lib, "d2d1.lib")
-#include <dwrite.h>
-#pragma comment(lib, "dwrite.lib")
+
 namespace ZUI
 {
 	namespace
@@ -95,9 +91,12 @@ namespace ZUI
 		public ZRender
 	{
 	public:
-		ZDirectRender(HWND hWnd, const RECT& rc) :
+		ZDirectRender(HWND hWnd, const RECT& rc, 
+			ID2D1Factory* factory, IDWriteFactory* writer) :
 			m_hWnd(hWnd), m_rc(rc)
 		{
+			m_pD2DFactory = factory;
+			m_pDWriteFactory = writer;
 			CreateResource();
 		}
 		virtual ~ZDirectRender()
@@ -117,8 +116,8 @@ namespace ZUI
 	private:
 		void CreateResource();
 	private:
-		CComPtr<ID2D1Factory>				m_pD2DFactory;
-		CComPtr<IDWriteFactory>				m_pDWriteFactory;
+		ID2D1Factory*						m_pD2DFactory;
+		IDWriteFactory*						m_pDWriteFactory;
 		CComPtr<ID2D1HwndRenderTarget>		m_pRT;
 		HWND								m_hWnd;
 		RECT								m_rc;
@@ -134,16 +133,16 @@ namespace ZUI
 		}
 		return false;
 	}
-	ZRender* ZPaintManager::CreateRender()
+	ZRender* ZPaintManager::CreateRender(HWND hWnd)
 	{
 		ZRender* ret = nullptr;
 		switch (m_mode)
 		{
 		case RMGDIPlus:
-			ret = CreateGdiRender(m_hWnd);
+			ret = CreateGdiRender(hWnd);
 			break;
 		case RMDirect2D:
-			ret = CreateDirectRender(m_hWnd);
+			ret = CreateDirectRender(hWnd);
 			break;
 		}
 		return ret;
@@ -165,10 +164,6 @@ namespace ZUI
 
 	void ZPaintManager::Clear()
 	{
-		if (m_render != nullptr) {
-			m_render->Release();
-			m_render = nullptr;
-		}
 		switch (m_mode)
 		{
 		case RMGDIPlus:
@@ -197,13 +192,21 @@ namespace ZUI
 	}
 	bool ZPaintManager::DX2DResourceInit()
 	{
+		D2D1CreateFactory(
+			D2D1_FACTORY_TYPE_SINGLE_THREADED,
+			&m_pD2DFactory);
+		DWriteCreateFactory(
+			DWRITE_FACTORY_TYPE_SHARED,
+			__uuidof(IDWriteFactory),
+			reinterpret_cast<IUnknown**>(&m_pDWriteFactory));
 		return true;
 	}
 	ZRender* ZPaintManager::CreateDirectRender(HWND hWnd)
 	{
 		RECT rc;
 		::GetClientRect(hWnd, &rc);
-		ZDirectRender* pdxRender = new ZDirectRender(hWnd, rc);
+		ZDirectRender* pdxRender = new ZDirectRender(hWnd, rc,
+			m_pD2DFactory, m_pDWriteFactory);
 		return pdxRender;
 	}
 	void ZPaintManager::DX2DClear()
@@ -379,13 +382,7 @@ namespace ZUI
 	}
 	void ZDirectRender::CreateResource()
 	{
-		D2D1CreateFactory(
-			D2D1_FACTORY_TYPE_SINGLE_THREADED,
-			&m_pD2DFactory);
-		DWriteCreateFactory(
-			DWRITE_FACTORY_TYPE_SHARED,
-			__uuidof(IDWriteFactory),
-			reinterpret_cast<IUnknown**>(&m_pDWriteFactory));
+
 		//RECT _rc;
 		//::GetClientRect(m_hWnd, &_rc);
 		D2D1_SIZE_U size = D2D1::SizeU(m_rc.right, m_rc.bottom);
