@@ -57,6 +57,9 @@
     <ClInclude Include="ZPaintManager.h">
       <Filter>MyControls</Filter>
     </ClInclude>
+    <ClInclude Include="ZRender.h">
+      <Filter>MyControls</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -75,6 +78,9 @@
       <Filter>MyControls</Filter>
     </ClCompile>
     <ClCompile Include="ZBase.cpp">
+      <Filter>MyControls</Filter>
+    </ClCompile>
+    <ClCompile Include="ZRender.cpp">
       <Filter>MyControls</Filter>
     </ClCompile>
   </ItemGroup>

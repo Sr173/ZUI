@@ -100,8 +100,7 @@ namespace ZUI
 			m_hWnd(nullptr),
 			m_paintManager(nullptr),
 			m_render(nullptr),
-			m_backColor(255,255,255),
-			m_bRefreshRender(true)
+			m_backColor(255,255,255)
 		{}
 		virtual ~ZWinBase()
 		{
@@ -290,17 +289,15 @@ namespace ZUI
 	protected:
 		void RefreshRender()
 		{
-			m_bRefreshRender = true;
+			RECT rc;
+			GetClientRect(&rc);
+			m_render->Resize(rc);
 		}
 		ZRender* GetRender()
 		{
-			if (m_bRefreshRender) {
-				if (m_render != nullptr) {
-					m_render->Release();
-				}
+			if (m_render == nullptr) {
 				m_render = m_paintManager->CreateRender(m_hWnd);
 				m_render->Clear(m_backColor);
-				m_bRefreshRender = false;
 			}
 			return m_render;
 		}
@@ -320,7 +317,6 @@ namespace ZUI
 		std::vector<ZControl*>	m_pControls;
 		ZPaintManager*			m_paintManager;
 		ZRender*				m_render;
-		bool					m_bRefreshRender;
 		ZColor					m_backColor;
 	};
 }

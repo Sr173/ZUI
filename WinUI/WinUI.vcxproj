@@ -89,6 +89,7 @@
     <ClInclude Include="ZEvent.h" />
     <ClInclude Include="ZHead.h" />
     <ClInclude Include="ZPaintManager.h" />
+    <ClInclude Include="ZRender.h" />
     <ClInclude Include="ZUIBase.h" />
   </ItemGroup>
   <ItemGroup>
@@ -101,6 +102,7 @@
     <ClCompile Include="ZCommonControls.cpp" />
     <ClCompile Include="ZCommonWnd.cpp" />
     <ClCompile Include="ZPaintManager.cpp" />
+    <ClCompile Include="ZRender.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WinUI.rc" />

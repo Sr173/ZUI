@@ -77,6 +77,7 @@ namespace ZUI
 		virtual bool FillRectangle(RECT rc, ZColor color);
 		virtual bool DrawRectangle(RECT rc, ZColor color);
 		virtual bool DrawLine(ZColor color, POINT pt1, POINT pt2);
+		virtual bool Resize(RECT rc);
 		virtual bool Clear(ZColor color);
 		virtual void Release()
 		{
@@ -108,6 +109,7 @@ namespace ZUI
 		virtual bool FillRectangle(RECT rc, ZColor color);
 		virtual bool DrawRectangle(RECT rc, ZColor color);
 		virtual bool DrawLine(ZColor color, POINT pt1, POINT pt2);
+		virtual bool Resize(RECT rc);
 		virtual bool Clear(ZColor color);
 		virtual void Release()
 		{
@@ -115,6 +117,7 @@ namespace ZUI
 		}
 	private:
 		void CreateResource();
+		static D2D1_RECT_F RectToD2D1RectF(const RECT& rc);
 	private:
 		ID2D1Factory*						m_pD2DFactory;
 		IDWriteFactory*						m_pDWriteFactory;
@@ -265,6 +268,10 @@ namespace ZUI
 		m_graphics.DrawLine(&pen, ptstart, ptend);
 		return true;
 	}
+	bool ZGdiRender::Resize(RECT rc)
+	{
+		return true;
+	}
 	bool ZGdiRender::Clear(ZColor color)
 	{
 		m_graphics.Clear(ZColor2GdiColor(color));
@@ -372,6 +379,25 @@ namespace ZUI
 			pBrush);
 		m_pRT->EndDraw();
 		return true;
+	}
+	bool ZDirectRender::Resize(RECT rc)
+	{
+		HRESULT hr = m_pRT->Resize(
+			D2D1::SizeU(rc.right - rc.left, rc.bottom - rc.top));
+		if (FAILED(hr)) {
+			return false;
+		}
+		else {
+			return true;
+		}
+	}
+	D2D1_RECT_F ZDirectRender::RectToD2D1RectF(const RECT& rc)
+	{
+		return D2D1::RectF(
+			static_cast<FLOAT>(rc.left),
+			static_cast<FLOAT>(rc.top),
+			static_cast<FLOAT>(rc.right),
+			static_cast<FLOAT>(rc.bottom));
 	}
 	bool ZDirectRender::Clear(ZColor color)
 	{
