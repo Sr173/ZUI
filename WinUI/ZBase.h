@@ -9,9 +9,11 @@ namespace ZUI
 	public:
 		virtual ~ZObject()
 		{}
+		virtual const wchar_t* GetType() const {
+			return L"object";
+		}
 	};
-	class NoCopyable :
-		public ZObject
+	class NoCopyable
 	{
 	public:
 		NoCopyable()
@@ -36,6 +38,7 @@ namespace ZUI
 		{}
 		virtual ~ZNullable()
 		{}
+
 	public:
 		bool IsNull() const {
 			return m_bNull;
@@ -65,6 +68,7 @@ namespace ZUI
 		{
 			Clear();
 		}
+
 		ZStringA(const ZStringA& str) :
 			ZNullable(true)
 		{
@@ -79,6 +83,9 @@ namespace ZUI
 				strcpy_s(m_buffer, m_length + 1, str.m_buffer);
 			}
 			return *this;
+		}
+		virtual const wchar_t* GetType() const {
+			return L"stringA";
 		}
 		bool operator==(const ZStringA& str) const
 		{
@@ -195,6 +202,9 @@ namespace ZUI
 				wcscpy_s(m_buffer, m_length + 1, str.m_buffer);
 			}
 			return *this;
+		}
+		virtual const wchar_t* GetType() const {
+			return L"stringW";
 		}
 		bool operator==(const ZStringW& str) const
 		{

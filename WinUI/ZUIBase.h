@@ -46,6 +46,9 @@ namespace ZUI
 		}
 		virtual ~ZControl()
 		{}
+		virtual const wchar_t* GetType() const {
+			return L"control";
+		}
 	public:
 		virtual void DrawSelf(HWND owner, ZRender* render, const RECT& rc) = 0;
 		virtual void HandleEvent(ZControlMsg& msg) = 0;
@@ -111,6 +114,9 @@ namespace ZUI
 			if (m_render != nullptr) {
 				m_render->Release();
 			}
+		}
+		virtual const wchar_t* GetType() const {
+			return L"winbase";
 		}
 	public:
 		BOOL Create(

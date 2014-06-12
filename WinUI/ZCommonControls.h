@@ -23,6 +23,9 @@ namespace ZUI
 		}
 		virtual ~ZLabel()
 		{}
+		virtual const wchar_t* GetType() const {
+			return L"label";
+		}
 	public:
 		//ZControl methods
 		virtual void DrawSelf(HWND owner, ZRender* render, const RECT& rc);
@@ -118,6 +121,9 @@ namespace ZUI
 		ZButton();
 		virtual ~ZButton()
 		{}
+		virtual const wchar_t* GetType() const {
+			return L"button";
+		}
 	public:
 		virtual void DrawSelf(HWND owner, ZRender* render, const RECT& _rc);
 	public:
@@ -138,6 +144,9 @@ namespace ZUI
 		ZTextBox();
 		virtual ~ZTextBox()
 		{}
+		virtual const wchar_t* GetType() const {
+			return L"textbox";
+		}
 	public:
 		virtual void SetFocus();
 		virtual void LostFocus();

@@ -128,10 +128,10 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 {
 	ZUI::ZPaintManager *paintManager = new ZUI::ZPaintManager();
 	paintManager->Setup(_T("direct2d"));
+	//paintManager->Setup(_T("gdiplus"));
 	HelloWindow* hellowindow = new HelloWindow();
 	hellowindow->SetPaintManager(paintManager);
 
-	//paintManager->Setup(_T("gdiplus"));
 	ZUI::ZLabel* label = new ZUI::ZLabel();
 	label->SetPosition(100, 100);
 	label->SetWidth(200);
