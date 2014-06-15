@@ -177,6 +177,10 @@ namespace ZUI
 			GetClientRect(&rc);
 			InvalidateRect(m_hWnd, &rc, TRUE);
 		}
+		UINT_PTR SetTimer(UINT_PTR nIDEvent, UINT uElapse, TIMERPROC lpTimerFunc)
+		{
+			return ::SetTimer(m_hWnd, nIDEvent, uElapse, lpTimerFunc);
+		}
 	protected:
 		//functions must be implement
 		virtual LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) = 0;
@@ -267,11 +271,18 @@ namespace ZUI
 		void DrawMySelf(const RECT& rc) {
 			assert(m_paintManager != NULL);
 			ZRender* render = GetRender();
-			render->FillRectangle(rc, m_backColor);
+			render->BeginPaint();
+			RECT _rc;
+			GetClientRect(&_rc);
+			render->Clear(m_backColor);
+			//render->DrawRectangle(_rc, ZColor(255, 0, 0));
+			
 			for each (auto control in m_pControls)
 			{
 				control->DrawSelf(m_hWnd, render, rc);
 			}
+			
+			render->EndPaint();
 		}
 		void AddControl(ZControl* control) {
 			assert(control != NULL);
@@ -303,7 +314,6 @@ namespace ZUI
 		{
 			if (m_render == nullptr) {
 				m_render = m_paintManager->CreateRender(m_hWnd);
-				m_render->Clear(m_backColor);
 			}
 			return m_render;
 		}

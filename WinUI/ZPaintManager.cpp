@@ -72,6 +72,8 @@ namespace ZUI
 		{}
 	public:
 		//ZRender method
+		virtual bool BeginPaint();
+		virtual bool EndPaint();
 		virtual bool PaintText(RECT rc, ZStringW text,
 			int fontSize, ZColor fontColor, TextAlignMode alignModeX, TextAlignMode alignModeY);
 		virtual bool FillRectangle(RECT rc, ZColor color);
@@ -104,6 +106,8 @@ namespace ZUI
 		{}
 	public:
 		//ZRender method
+		virtual bool BeginPaint();
+		virtual bool EndPaint();
 		virtual bool PaintText(RECT rc, ZStringW text,
 			int fontSize, ZColor fontColor, TextAlignMode alignModeX, TextAlignMode alignModeY);
 		virtual bool FillRectangle(RECT rc, ZColor color);
@@ -216,7 +220,15 @@ namespace ZUI
 	{
 	}
 	//ZGdiRender begin
+	bool ZGdiRender::BeginPaint()
+	{
 
+		return true;
+	}
+	bool ZGdiRender::EndPaint()
+	{
+		return true;
+	}
 	bool ZGdiRender::PaintText(RECT rc, ZStringW text,
 		int fontSize, ZColor fontColor, TextAlignMode alignModeX, TextAlignMode alignModeY)
 	{
@@ -279,6 +291,22 @@ namespace ZUI
 	}
 	//ZGdiRender end
 	//ZDirectRender begin
+	bool ZDirectRender::BeginPaint()
+	{
+		m_pRT->BeginDraw();
+		return true;
+	}
+	bool ZDirectRender::EndPaint()
+	{
+		HRESULT hr;
+		hr = m_pRT->EndDraw();
+		if (FAILED(hr)) {
+			return false;
+		}
+		else {
+			return true;
+		}
+	}
 	bool ZDirectRender::PaintText(RECT rc, ZStringW text, int fontSize, ZColor fontColor,
 		TextAlignMode alignModeX, TextAlignMode alignModeY)
 	{
@@ -310,14 +338,12 @@ namespace ZUI
 			static_cast<FLOAT>(rc.top),
 			static_cast<FLOAT>(rc.right),
 			static_cast<FLOAT>(rc.bottom));
-		m_pRT->BeginDraw();
 		m_pRT->DrawTextW(
 			text.c_str(),
 			cTextLength,
 			pTextFormat,
 			layoutRect,
 			pBrush);
-		m_pRT->EndDraw();
 		return true;
 	}
 	bool ZDirectRender::FillRectangle(RECT rc, ZColor color)
@@ -328,7 +354,6 @@ namespace ZUI
 			ZColor2DirectColor(color),
 			&pBrush);
 		if (FAILED(hr)) return false;
-		m_pRT->BeginDraw();
 		m_pRT->FillRectangle(
 			D2D1::RectF(
 			static_cast<FLOAT>(rc.left),
@@ -336,7 +361,6 @@ namespace ZUI
 			static_cast<FLOAT>(rc.right),
 			static_cast<FLOAT>(rc.bottom)),
 			pBrush);
-		m_pRT->EndDraw();
 		return true;
 	}
 	bool ZDirectRender::DrawRectangle(RECT rc, ZColor color)
@@ -347,7 +371,6 @@ namespace ZUI
 			ZColor2DirectColor(color),
 			&pBrush);
 		if (FAILED(hr)) return false;
-		m_pRT->BeginDraw();
 		m_pRT->DrawRectangle(
 			D2D1::RectF(
 			static_cast<FLOAT>(rc.left),
@@ -355,7 +378,6 @@ namespace ZUI
 			static_cast<FLOAT>(rc.right),
 			static_cast<FLOAT>(rc.bottom)),
 			pBrush);
-		m_pRT->EndDraw();
 		return true;
 	}
 	bool ZDirectRender::DrawLine(ZColor color, POINT pt1, POINT pt2)
@@ -366,7 +388,6 @@ namespace ZUI
 			ZColor2DirectColor(color),
 			&pBrush);
 		if (FAILED(hr)) return false;
-		m_pRT->BeginDraw();
 		m_pRT->DrawLine(
 			D2D1::Point2F(
 			static_cast<FLOAT>(pt1.x),
@@ -377,7 +398,6 @@ namespace ZUI
 			static_cast<FLOAT>(pt2.y)
 			),
 			pBrush);
-		m_pRT->EndDraw();
 		return true;
 	}
 	bool ZDirectRender::Resize(RECT rc)
@@ -401,9 +421,7 @@ namespace ZUI
 	}
 	bool ZDirectRender::Clear(ZColor color)
 	{
-		m_pRT->BeginDraw();
 		m_pRT->Clear(ZColor2DirectColor(color));
-		m_pRT->EndDraw();
 		return true;
 	}
 	void ZDirectRender::CreateResource()

@@ -32,22 +32,22 @@ namespace ZUI
 		virtual void HandleEvent(ZControlMsg& msg);
 		virtual void Release();
 	public:
-		void		SetText(const ZStringW& text) {
+		virtual void		SetText(const ZStringW& text) {
 			m_text = text;
 		}
-		ZStringW	GetText() const {
+		virtual ZStringW	GetText() const {
 			return m_text;
 		}
-		void		SetTextSize(int size) {
+		virtual void		SetTextSize(int size) {
 			m_fontSize = size;
 		}
-		void		SetTextColor(BYTE r, BYTE g, BYTE b, BYTE a = 255) {
+		virtual void		SetTextColor(BYTE r, BYTE g, BYTE b, BYTE a = 255) {
 			m_fontColor = ZColor(r, g, b, a);
 		}
-		void		SetBackColor(BYTE r, BYTE g, BYTE b, BYTE a = 255) {
+		virtual void		SetBackColor(BYTE r, BYTE g, BYTE b, BYTE a = 255) {
 			m_backColor = ZColor(r, g, b, a);
 		}
-		void		SetBorderColor(BYTE r, BYTE g, BYTE b, BYTE a = 255) {
+		virtual void		SetBorderColor(BYTE r, BYTE g, BYTE b, BYTE a = 255) {
 			m_borderColor = ZColor(r, g, b, a);
 		}
 		void		SetRect(RECT rc) {
@@ -151,6 +151,10 @@ namespace ZUI
 		virtual void SetFocus();
 		virtual void LostFocus();
 		virtual void HandleEvent(ZControlMsg& msg);
+		virtual void SetBackColor(BYTE r, BYTE g, BYTE b, BYTE a) {
+			//TextBox ingore alpha
+			ZLabel::SetBackColor(r, g, b, 255);
+		}
 	public:
 		void NotifyOnGetFocus(ControlFunc func) {
 			m_getFocus.subscribe(func);

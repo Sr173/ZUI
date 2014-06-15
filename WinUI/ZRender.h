@@ -13,7 +13,31 @@
 #pragma comment(lib, "dwrite.lib")
 namespace ZUI
 {
+	class ZSolidBrush :
+		public ZObject,
+		public NoCopyable
+	{
+	public:
+		ZSolidBrush(ZColor color) :
+			m_color(color)
+		{}
+		virtual ~ZSolidBrush()
+		{}
+		virtual const wchar_t* GetType() const {
+			return L"solidbrush";
+		}
+	public:
+		ZColor GetColor() const {
+			return m_color;
+		}
+		void SetColor(ZColor color) {
+			m_color = color;
+		}
+	private:
+		ZColor	m_color;
+	};
 	class ZRender :
+		public ZObject,
 		public NoCopyable
 	{
 	public:
@@ -27,6 +51,8 @@ namespace ZUI
 		virtual ~ZRender()
 		{}
 	public:
+		virtual bool BeginPaint() = 0;
+		virtual bool EndPaint() = 0;
 		virtual bool PaintText(RECT rc, ZStringW text,
 			int fontSize, ZColor fontColor,
 			TextAlignMode alignModeX, TextAlignMode alignModeY) = 0;

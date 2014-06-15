@@ -6,6 +6,7 @@
 namespace ZUI
 {
 	class ZPaintManager :
+		public ZObject,
 		public NoCopyable
 	{
 	public:
@@ -24,6 +25,7 @@ namespace ZUI
 		~ZPaintManager()
 		{
 			Clear();
+			
 		}
 		void Release()
 		{

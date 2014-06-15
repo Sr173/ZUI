@@ -137,14 +137,13 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	label->SetWidth(200);
 	label->SetText(L"Control Test");
 	label->SetBackColor(0x66, 0xcc, 0xff, 255);
+	//label->SetBorderColor(0xff, 0, 0);
 	label->NotifyOnLButtonUp(BeClick);
 	label->NotifyOnRButtonUp(RClick);
 	label->NotifyOnMouseMoveIn(MoveIn);
 	label->NotifyOnMouseMoveOut(MoveOut);
 
-	hellowindow->AddControl(label);
-	hellowindow->Create(L"hellowindow", WS_OVERLAPPEDWINDOW);
-	hellowindow->Show();
+
 	
 	
 	ZUI::ZLabel* label1 = new ZUI::ZLabel();
@@ -163,17 +162,25 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	button1->SetBackColor(0x66, 0xcc, 0xff, 255);
 	button1->NotifyOnLButtonUp(BeClick);
 	button1->NotifyOnRButtonUp(RClick);
-	hellowindow->AddControl(button1);
 	ZUI::ZLabel* label2 = new ZUI::ZLabel();
 	hellowindow->AddControl(label2);
 	hellowindow->RemoveControl(label2);
 	//hellowindow->AddControl(label1);
+	ZUI::ZButton* button2 = new ZUI::ZButton();
+	button2->SetPosition(50, 50);
+	//button1->SetWidth(100);
+	button2->SetHoverColor(0xff, 0x00, 0xff, 127);
+	button2->SetText(L"²âÊÔ°´Å¥");
+	button2->SetBackColor(0x66, 0xcc, 0xff, 255);
+	button2->NotifyOnLButtonUp(BeClick);
+	button2->NotifyOnRButtonUp(RClick);
 	ZUI::ZCommonWnd::CmnMsgWnd* msgwindow = new ZUI::ZCommonWnd::CmnMsgWnd();
 	ZUI::ZPaintManager* paintManager1 = new ZUI::ZPaintManager();
 	paintManager1->Setup(_T("gdiplus"));
 	msgwindow->SetPaintManager(paintManager1);
 	msgwindow->AddControl(label1);
-	msgwindow->Create(L"hihi", 300, 200, NULL/*, hellowindow->GetHWND()*/);
+	msgwindow->AddControl(button2);
+	msgwindow->Create(L"hihi", 300, 200, NULL, hellowindow->GetHWND());
 	msgwindow->SetText(L"Hi, World!");
 	msgwindow->SetTextColor(0x66, 0xcc, 0xff);
 	msgwindow->SetBackColor(0, 0, 0);
@@ -188,6 +195,10 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	textbox->NotifyOnLostFocus(LostFocus);
 	*/
 	hellowindow->AddControl(textbox);
+	hellowindow->AddControl(button1);
+	hellowindow->AddControl(label);
+	hellowindow->Create(L"hellowindow", WS_OVERLAPPEDWINDOW);
+	hellowindow->Show();
 
 	ZUI::ZPaintManager::MessageLoop();
 	paintManager->Release();

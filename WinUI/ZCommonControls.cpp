@@ -14,7 +14,7 @@ namespace ZUI
 	{
 		assert(IsWindow(owner));
 		if (render == nullptr) return;
-		if (!IsRectCross(_rc, m_rc)) return;
+		//if (!IsRectCross(_rc, m_rc)) return;
 		//ZRender* render = painter->CreateRender(owner, m_rc);
 		render->FillRectangle(m_rc, m_backColor);
 		render->DrawRectangle(m_rc, m_borderColor);
