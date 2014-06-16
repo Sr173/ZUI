@@ -228,6 +228,10 @@ namespace ZUI
 			PAINTSTRUCT ps;
 			switch (msg.uMsg)
 			{
+			case WM_DISPLAYCHANGE:
+				Invalidate();
+				msg.bHandled = true;
+				break;
 			case WM_PAINT:
 				::BeginPaint(msg.hWnd, &ps);
 				DrawMySelf(ps.rcPaint);

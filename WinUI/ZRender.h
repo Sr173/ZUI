@@ -13,9 +13,17 @@
 #pragma comment(lib, "dwrite.lib")
 namespace ZUI
 {
-	class ZSolidBrush :
+	class ZBrush :
 		public ZObject,
 		public NoCopyable
+	{
+	public:
+		virtual const wchar_t* GetType() const {
+			return L"brush";
+		}
+	};
+	class ZSolidBrush :
+		public ZBrush
 	{
 	public:
 		ZSolidBrush(ZColor color) :
