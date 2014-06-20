@@ -1,6 +1,7 @@
 #ifndef ZUI_ZBASE_HEADER
 #define ZUI_ZBASE_HEADER
 #include <iostream>
+#include <list>
 #include <windows.h>
 namespace ZUI
 {
@@ -161,10 +162,45 @@ namespace ZUI
 			{
 				if (m_buffer[i] <= 'Z'
 					&& m_buffer[i] >= 'A') {
-					m_buffer[i] -= ('A' - 'a');
+					lowerStr.m_buffer[i] -= ('A' - 'a');
 				}
 			}
 			return lowerStr;
+		}
+		ZStringA SubString(unsigned long start, unsigned long end) const
+		{
+			ZStringA str;
+			if (start >= Length() || end > Length()) {
+				return str;
+			}
+			char* buffer = new char[end - start + 2];
+			for (unsigned long i = start; i < end; ++i) {
+				buffer[i - start] = m_buffer[i];
+			}
+			buffer[end - start] = 0;
+			str = buffer;
+			delete[] buffer;
+			return str;
+		}
+		long Find(ZStringA subString, long start = 0, long end = -1)
+		{
+			long subLength = subString.Length();
+			if (end == -1) end = Length();
+			for (long i = start; i <= end - subLength; ++i)
+			{
+				bool bFlag = true;
+				for (long j = 0; j < subLength; ++j)
+				{
+					if (subString.m_buffer[j] != m_buffer[i + j]) {
+						bFlag = false;
+						j = subLength;
+					}
+				}
+				if (bFlag) {
+					return i;
+				}
+			}
+			return -1;
 		}
 	private:
 		char*		m_buffer;
@@ -228,7 +264,7 @@ namespace ZUI
 		ZStringW operator+(const ZStringW& str)
 		{
 			ZStringW tmpStr = *this;
-			tmpStr += str;
+			tmpStr.Append(str);
 			return tmpStr;
 		}
 	public:
@@ -269,7 +305,7 @@ namespace ZUI
 		}
 		unsigned long Append(wchar_t c)
 		{
-			wchar_t tmpStr[] = { c , 0 };
+			wchar_t tmpStr[] = { c, 0 };
 			return Append(tmpStr);
 		}
 		ZStringW ToLower() const
@@ -280,10 +316,45 @@ namespace ZUI
 			{
 				if (m_buffer[i] <= L'Z'
 					&& m_buffer[i] >= L'A') {
-					m_buffer[i] -= (L'A' - L'a');
+					lowerStr.m_buffer[i] -= (L'A' - L'a');
 				}
 			}
 			return lowerStr;
+		}
+		ZStringW SubString(unsigned long start, unsigned long end) const
+		{
+			ZStringW str;
+			if (start >= Length() || end > Length()) {
+				return str;
+			}
+			wchar_t* buffer = new wchar_t[end - start + 2];
+			for (unsigned long i = start; i < end; ++i) {
+				buffer[i - start] = m_buffer[i];
+			}
+			buffer[end - start] = 0;
+			str = buffer;
+			delete[] buffer;
+			return str;
+		}
+		long Find(ZStringW subString, long start = 0, long end = -1)
+		{
+			long subLength = subString.Length();
+			if (end == -1) end = Length();
+			for (long i = start; i <= end - subLength; ++i)
+			{
+				bool bFlag = true;
+				for (long j = 0; j < subLength; ++j)
+				{
+					if (subString.m_buffer[j] != m_buffer[i + j]) {
+						bFlag = false;
+						j = subLength;
+					}
+				}
+				if (bFlag) {
+					return i;
+				}
+			}
+			return -1;
 		}
 	private:
 		wchar_t*		m_buffer;
@@ -303,6 +374,20 @@ namespace ZUI
 		{
 			r = _r; g = _g; b = _b; a = _a;
 		}
+	};
+	struct ZRect {
+		long left;
+		long right;
+		long top;
+		long bottom;
+	};
+	struct ZSize {
+		long width;
+		long height;
+	};
+	struct ZPoint {
+		long x;
+		long y;
 	};
 	inline bool PointInRect(long x, long y, const RECT& rc)
 	{
