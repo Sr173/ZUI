@@ -60,6 +60,9 @@
     <ClInclude Include="ZRender.h">
       <Filter>MyControls</Filter>
     </ClInclude>
+    <ClInclude Include="ZDirect2DRender.h">
+      <Filter>MyControls</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

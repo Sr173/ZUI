@@ -28,7 +28,7 @@ namespace ZUI
 		}
 	public:
 		//ZControl methods
-		virtual void DrawSelf(HWND owner, ZRender* render, const RECT& rc);
+		virtual void DrawSelf(HWND owner, ZRender* render, const ZRect& rc);
 		virtual void HandleEvent(ZControlMsg& msg);
 		virtual void Release();
 	public:
@@ -50,10 +50,10 @@ namespace ZUI
 		virtual void		SetBorderColor(BYTE r, BYTE g, BYTE b, BYTE a = 255) {
 			m_borderColor = ZColor(r, g, b, a);
 		}
-		void		SetRect(RECT rc) {
+		void		SetRect(ZRect rc) {
 			m_rc = rc;
 		}
-		RECT		GetRect() const {
+		ZRect		GetRect() const {
 			return m_rc;
 		}
 		void		SetWidth(int width) {
@@ -77,7 +77,12 @@ namespace ZUI
 		void Invalidate()
 		{
 			if (::IsWindow(m_parent)) {
-				::InvalidateRect(m_parent, &m_rc, TRUE);
+				RECT rc;
+				rc.left = m_rc.left;
+				rc.right = m_rc.right;
+				rc.bottom = m_rc.bottom;
+				rc.top = m_rc.top;
+				::InvalidateRect(m_parent, &rc, TRUE);
 			}
 		}
 	public:
@@ -103,7 +108,7 @@ namespace ZUI
 	protected:
 		ZStringW	m_text;	//Label text
 		int			m_fontSize;
-		RECT		m_rc; //layout
+		ZRect		m_rc; //layout
 		ZColor		m_fontColor;
 		ZColor		m_backColor;
 		ZColor		m_borderColor;
@@ -125,7 +130,7 @@ namespace ZUI
 			return L"button";
 		}
 	public:
-		virtual void DrawSelf(HWND owner, ZRender* render, const RECT& _rc);
+		virtual void DrawSelf(HWND owner, ZRender* render, const ZRect& _rc);
 	public:
 		void	SetHoverColor(BYTE r, BYTE g, BYTE b, BYTE a = 255) {
 			m_hoverBackColor = ZColor(r, g, b, a);

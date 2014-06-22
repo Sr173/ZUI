@@ -10,17 +10,30 @@ using namespace Gdiplus;
 namespace ZUI
 {
 	//ZLabel begin
-	void ZLabel::DrawSelf(HWND owner, ZRender* render, const RECT& _rc)
+	void ZLabel::DrawSelf(HWND owner, ZRender* render, const ZRect& _rc)
 	{
 		assert(IsWindow(owner));
 		if (render == nullptr) return;
 		//if (!IsRectCross(_rc, m_rc)) return;
 		//ZRender* render = painter->CreateRender(owner, m_rc);
-		render->FillRectangle(m_rc, m_backColor);
-		render->DrawRectangle(m_rc, m_borderColor);
+		ZSolidBrush* pBrush;
+		ZRenderResult rr = render->CreateSolidBrush(m_backColor, &pBrush);
+		if (rr < 0) return;
+		render->FillRectangle(m_rc, pBrush);
+		pBrush->SetColor(m_borderColor);
+		render->DrawRectangle(m_rc, pBrush);
+		pBrush->SetColor(m_fontColor);
 		if (!m_text.IsNull()) {
-			render->PaintText(m_rc, m_text, m_fontSize, m_fontColor, ZRender::TAMMiddle, ZRender::TAMMiddle);
+			ZFontFormat *fontFormat;
+			rr = render->CreateFontFormat(L"ËÎÌו", m_fontSize, &fontFormat);
+			if (rr >= 0) {
+				fontFormat->SetTextAlignment(ZFontFormat::TAMMiddle);
+				fontFormat->SetParagraphAlignment(ZFontFormat::TAMMiddle);
+				render->PaintText(m_text, m_rc, fontFormat, pBrush);
+				fontFormat->Release();
+			}
 		}
+		pBrush->Release();
 	}
 	void ZLabel::HandleEvent(ZControlMsg& msg)
 	{
@@ -88,7 +101,7 @@ namespace ZUI
 		NotifyOnMouseMoveIn(ZButton::OnMouseInEvent);
 		NotifyOnMouseMoveOut(ZButton::OnMouseOutEvent);
 	}
-	void ZButton::DrawSelf(HWND owner, ZRender* render, const RECT& _rc)
+	void ZButton::DrawSelf(HWND owner, ZRender* render, const ZRect& _rc)
 	{
 		ZColor tmpColor = m_backColor;
 		if (m_bHovered) {

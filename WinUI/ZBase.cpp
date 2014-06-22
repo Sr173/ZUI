@@ -3,7 +3,7 @@
 #include "ZBase.h"
 namespace ZUI
 {
-	bool IsRectCross(const RECT& rc1, const RECT& rc2)
+	bool IsRectCross(const ZRect& rc1, const ZRect& rc2)
 	{
 		LONG a_cx, a_cy;
 		LONG b_cx, b_cy;

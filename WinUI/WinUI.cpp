@@ -176,7 +176,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	button2->NotifyOnRButtonUp(RClick);
 	ZUI::ZCommonWnd::CmnMsgWnd* msgwindow = new ZUI::ZCommonWnd::CmnMsgWnd();
 	ZUI::ZPaintManager* paintManager1 = new ZUI::ZPaintManager();
-	paintManager1->Setup(_T("gdiplus"));
+	paintManager1->Setup(_T("direct2d"));
 	msgwindow->SetPaintManager(paintManager1);
 	msgwindow->AddControl(label1);
 	msgwindow->AddControl(button2);

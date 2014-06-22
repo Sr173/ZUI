@@ -28,6 +28,15 @@ namespace ZUI
 		controlMsg.bHandled = bHandled;
 		return controlMsg;
 	}
+	inline ZRect RECT2ZRect(const RECT& rc)
+	{
+		ZRect zrc;
+		zrc.bottom = rc.bottom;
+		zrc.left = rc.left;
+		zrc.right = rc.right;
+		zrc.top = rc.top;
+		return zrc;
+	}
 	//ZUI Message Define
 	enum
 	{
@@ -50,7 +59,7 @@ namespace ZUI
 			return L"control";
 		}
 	public:
-		virtual void DrawSelf(HWND owner, ZRender* render, const RECT& rc) = 0;
+		virtual void DrawSelf(HWND owner, ZRender* render, const ZRect& rc) = 0;
 		virtual void HandleEvent(ZControlMsg& msg) = 0;
 		virtual void Release() = 0;
 	public:
@@ -275,18 +284,15 @@ namespace ZUI
 		void DrawMySelf(const RECT& rc) {
 			assert(m_paintManager != NULL);
 			ZRender* render = GetRender();
-			render->BeginPaint();
-			RECT _rc;
-			GetClientRect(&_rc);
+			render->BeginRender();
 			render->Clear(m_backColor);
-			//render->DrawRectangle(_rc, ZColor(255, 0, 0));
-			
+			ZRect zrc = RECT2ZRect(rc);
 			for each (auto control in m_pControls)
 			{
-				control->DrawSelf(m_hWnd, render, rc);
+				control->DrawSelf(m_hWnd, render, zrc);
 			}
 			
-			render->EndPaint();
+			render->EndRender();
 		}
 		void AddControl(ZControl* control) {
 			assert(control != NULL);
@@ -312,7 +318,10 @@ namespace ZUI
 		{
 			RECT rc;
 			GetClientRect(&rc);
-			m_render->Resize(rc);
+			ZSize size;
+			size.width = rc.right - rc.left;
+			size.height = rc.bottom - rc.top;
+			m_render->ReSize(size);
 		}
 		ZRender* GetRender()
 		{

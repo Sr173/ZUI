@@ -389,15 +389,16 @@ namespace ZUI
 		long x;
 		long y;
 	};
-	inline bool PointInRect(long x, long y, const RECT& rc)
+	inline bool PointInRect(long x, long y, const ZRect& rc)
 	{
 		return (rc.left <= x&&rc.right >= x&&
 			rc.bottom >= y&&rc.top <= y) ? true : false;
 	}
-	inline bool PointInRect(const POINT& pt, const RECT& rc)
+	inline bool PointInRect(const POINT& pt, const ZRect& rc)
 	{
 		return PointInRect(pt.x, pt.y, rc);
 	}
-	bool IsRectCross(const RECT& rc1, const RECT& rc2);
+	bool IsRectCross(const ZRect& rc1, const ZRect& rc2);
+	
 }
 #endif //ZUI_ZBASE_HEADER

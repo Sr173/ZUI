@@ -33,10 +33,7 @@ namespace ZUI
 		}
 	public:
 		bool Setup(ZString engine);
-		bool Setup(RenderMode mode) {
-			m_mode = mode;
-			return ResouceInit();
-		}
+		bool Setup(RenderMode mode);
 		ZRender* CreateRender(HWND hWnd);
 	public:
 		static int MessageLoop()
@@ -63,16 +60,6 @@ namespace ZUI
 		void DX2DClear();
 	private:
 		RenderMode						m_mode;
-		//gdi+ resource
-		Gdiplus::GdiplusStartupInput	gdiplusStartupInput;
-		ULONG_PTR						gdiplusToken;
-		//direct2d resource
-		CComPtr<ID2D1Factory>			m_pD2DFactory;
-		CComPtr<IDWriteFactory>			m_pDWriteFactory;
 	};
-	inline Gdiplus::Color ZColor2GdiColor(const ZColor& color)
-	{
-		return Gdiplus::Color(color.a, color.r, color.g, color.b);
-	}
 }
 #endif //ZUI_ZPAINTMANAGER_HEADER
