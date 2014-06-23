@@ -59,11 +59,16 @@ namespace ZUI
 			ZNullable(true), m_buffer(nullptr), m_length(0)
 		{}
 		ZStringA(const char* str) :
-			ZNullable(false)
+			ZNullable(false), m_buffer(nullptr), m_length(0)
 		{
-			m_length = strlen(str);
-			m_buffer = new char[m_length + 1];
-			strcpy_s(m_buffer, m_length + 1, str);
+			if (str == nullptr) {
+				SetNull(true);
+			}
+			else {
+				m_length = strlen(str);
+				m_buffer = new char[m_length + 1];
+				strcpy_s(m_buffer, m_length + 1, str);
+			}
 		}
 		~ZStringA()
 		{
@@ -71,17 +76,21 @@ namespace ZUI
 		}
 
 		ZStringA(const ZStringA& str) :
-			ZNullable(true)
+			ZNullable(true), m_buffer(nullptr), m_length(0)
 		{
 			*this = str;
 		}
 		ZStringA& operator=(const ZStringA& str)
 		{
-			SetNull(str.IsNull());
-			if (!IsNull()) {
+			Clear();
+			if (!str.IsNull()) {
+				SetNull(false);
 				m_length = str.Length();
 				m_buffer = new char[m_length + 1];
 				strcpy_s(m_buffer, m_length + 1, str.m_buffer);
+			}
+			else {
+				SetNull(true);
 			}
 			return *this;
 		}
@@ -214,28 +223,37 @@ namespace ZUI
 			ZNullable(true), m_buffer(nullptr), m_length(0)
 		{}
 		ZStringW(const wchar_t* str) :
-			ZNullable(false)
+			ZNullable(false), m_buffer(nullptr), m_length(0)
 		{
-			m_length = wcslen(str);
-			m_buffer = new wchar_t[m_length + 1];
-			wcscpy_s(m_buffer, m_length + 1, str);
+			if (str == nullptr) {
+				SetNull(true);
+			}
+			else {
+				m_length = wcslen(str);
+				m_buffer = new wchar_t[m_length + 1];
+				wcscpy_s(m_buffer, m_length + 1, str);
+			}
 		}
 		~ZStringW()
 		{
 			Clear();
 		}
 		ZStringW(const ZStringW& str) :
-			ZNullable(true)
+			ZNullable(true), m_buffer(nullptr), m_length(0)
 		{
 			*this = str;
 		}
 		ZStringW& operator=(const ZStringW& str)
 		{
-			SetNull(str.IsNull());
-			if (!IsNull()) {
+			Clear();
+			if (!str.IsNull()) {
+				SetNull(false);
 				m_length = str.Length();
 				m_buffer = new wchar_t[m_length + 1];
 				wcscpy_s(m_buffer, m_length + 1, str.m_buffer);
+			}
+			else {
+				SetNull(true);
 			}
 			return *this;
 		}
@@ -377,8 +395,8 @@ namespace ZUI
 	};
 	struct ZRect {
 		long left;
-		long right;
 		long top;
+		long right;
 		long bottom;
 	};
 	struct ZSize {

@@ -3,7 +3,8 @@
 #include "ZBase.h"
 #include "ZUIBase.h"
 #include "ZEvent.h"
-
+#include <iostream>
+#include <list>
 namespace ZUI
 {
 	class ZLabel :
@@ -183,6 +184,38 @@ namespace ZUI
 	protected:
 		ZControlEvent	m_lostFocus;
 		ZControlEvent	m_getFocus;
+	};
+	class ZLayout :
+		public ZControl
+	{
+	public:
+		ZLayout()
+		{}
+		virtual ~ZLayout();
+		virtual const wchar_t* GetType() const {
+			return L"layout";
+		}
+	public:
+		virtual ZControl* FindControl(ZString id);
+		virtual void DrawSelf(HWND owner, ZRender* render, const ZRect& rc);
+		virtual void HandleEvent(ZControlMsg& msg);
+		virtual void Release() {
+			delete this;
+		}
+		virtual void SetHWND(HWND hwnd);
+	public:
+		ZRect GetRect() const {
+			return m_rc;
+		}
+		void SetRect(const ZRect& rc) {
+			m_rc = rc;
+		}
+		void AddControl(ZControl* control);
+	protected:
+		void AdjustLayout();
+	protected:
+		ZRect					m_rc;
+		std::list<ZControl*>	m_controlList;
 	};
 }
 

@@ -82,18 +82,22 @@
     <ClCompile Include="..\WinUI\ZCommonControls.cpp" />
     <ClCompile Include="..\WinUI\ZCommonWnd.cpp" />
     <ClCompile Include="..\WinUI\ZPaintManager.cpp" />
+    <ClCompile Include="..\WinUI\ZRender.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="ZEventTest.cpp" />
     <ClCompile Include="ZFuncTest.cpp" />
     <ClCompile Include="ZTypeTest.cpp" />
+    <ClCompile Include="ZWndText.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\WinUI\ZBase.h" />
     <ClInclude Include="..\WinUI\ZCommonControls.h" />
     <ClInclude Include="..\WinUI\ZCommonWnd.h" />
+    <ClInclude Include="..\WinUI\ZDirect2DRender.h" />
     <ClInclude Include="..\WinUI\ZEvent.h" />
     <ClInclude Include="..\WinUI\ZHead.h" />
     <ClInclude Include="..\WinUI\ZPaintManager.h" />
+    <ClInclude Include="..\WinUI\ZRender.h" />
     <ClInclude Include="..\WinUI\ZUIBase.h" />
     <ClInclude Include="Test.h" />
   </ItemGroup>

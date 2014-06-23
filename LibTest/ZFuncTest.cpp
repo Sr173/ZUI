@@ -3,7 +3,7 @@
 using namespace ZUI;
 void Test_IsRectCross()
 {
-	RECT rects[] = {
+	ZRect rects[] = {
 		{ 0, 0, 10, 10 }, { 20, 20, 30, 30 }, /* 不相交 */
 		{ 20, 20, 30, 30 }, { 0, 0, 10, 10 }, /* 不相交 */
 		{ 0, 0, 10, 10 }, { 0, 0, 10, 10 }, /* 重合 */

@@ -79,12 +79,26 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\WinUI\ZBase.h" />
+    <ClInclude Include="..\WinUI\ZCommonControls.h" />
+    <ClInclude Include="..\WinUI\ZCommonWnd.h" />
+    <ClInclude Include="..\WinUI\ZDirect2DRender.h" />
+    <ClInclude Include="..\WinUI\ZEvent.h" />
+    <ClInclude Include="..\WinUI\ZHead.h" />
+    <ClInclude Include="..\WinUI\ZPaintManager.h" />
+    <ClInclude Include="..\WinUI\ZRender.h" />
+    <ClInclude Include="..\WinUI\ZUIBase.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="WinUITest.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\WinUI\ZBase.cpp" />
+    <ClCompile Include="..\WinUI\ZCommonControls.cpp" />
+    <ClCompile Include="..\WinUI\ZCommonWnd.cpp" />
+    <ClCompile Include="..\WinUI\ZPaintManager.cpp" />
+    <ClCompile Include="..\WinUI\ZRender.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

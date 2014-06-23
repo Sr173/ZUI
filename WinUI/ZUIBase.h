@@ -69,6 +69,14 @@ namespace ZUI
 		virtual ZString GetId() const {
 			return m_id;
 		}
+		virtual ZControl* FindControl(ZString id) {
+			if ((!m_id.IsNull()) && m_id == id) {
+				return this;
+			}
+			else {
+				return nullptr;
+			}
+		}
 		virtual void SetHWND(HWND hwnd)
 		{
 			m_parent = hwnd;

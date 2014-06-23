@@ -4,3 +4,4 @@
 void ZEventTest();
 void ZFuncTest();
 void ZTypeTest();
+void ZWndTest();

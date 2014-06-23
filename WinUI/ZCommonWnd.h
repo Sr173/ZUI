@@ -30,7 +30,7 @@ namespace ZUI
 		private:
 			void OnPaint(HDC hdc);
 		private:
-			LPWSTR		m_lpText;  //文字
+			ZStringW		m_lpText;  //文字
 			ZColor		m_fontColor; //文字颜色
 			ZColor		m_backColor; //背景颜色
 			int			m_fontSize; //字体大小

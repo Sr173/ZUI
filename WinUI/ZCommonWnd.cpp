@@ -32,13 +32,7 @@ namespace ZUI
 		CmnMsgWnd& CmnMsgWnd::SetText(LPCWSTR text)
 		{
 			if (m_lpText != NULL) {
-				delete[] m_lpText;
 				m_lpText = NULL;
-			}
-			if (text != NULL) {
-				unsigned int len = wcslen(text);
-				m_lpText = new WCHAR[len + 1];
-				_tcscpy_s(m_lpText, (len + 1)*sizeof(WCHAR), text);
 			}
 			Invalidate();
 			return *this;
@@ -112,7 +106,7 @@ namespace ZUI
 			StringFormat format;
 			format.SetAlignment(StringAlignment::StringAlignmentCenter);
 			format.SetLineAlignment(StringAlignment::StringAlignmentCenter);
-			graphics.DrawString(m_lpText, -1, &font, pt, &format, &brush);
+			graphics.DrawString(m_lpText.c_str(), -1, &font, pt, &format, &brush);
 		}
 		//CmnMsgWnd
 	}

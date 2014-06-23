@@ -42,6 +42,12 @@
     <ClCompile Include="ZTypeTest.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\WinUI\ZRender.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ZWndText.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Test.h">
@@ -67,6 +73,12 @@
     </ClInclude>
     <ClInclude Include="..\WinUI\ZUIBase.h">
       <Filter>ZUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WinUI\ZDirect2DRender.h">
+      <Filter>ZUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WinUI\ZRender.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -222,4 +222,60 @@ namespace ZUI
 		}
 	}
 	//ZTextBox end
+	//ZLayout begin
+	ZLayout::~ZLayout()
+	{
+		for each (auto control in m_controlList)
+		{
+			control->Release();
+		}
+	}
+	ZControl* ZLayout::FindControl(ZString id)
+	{
+		if ((!GetId().IsNull()) && id == GetId()) {
+			return this;
+		}
+		for each (auto control in m_controlList)
+		{
+			ZControl* ret = control->FindControl(id);
+			if (ret != nullptr) {
+				return ret;
+			}
+		}
+		return nullptr;
+	}
+	void ZLayout::DrawSelf(HWND owner, ZRender* render, const ZRect& rc)
+	{
+		AdjustLayout();
+		for each (auto control in m_controlList)
+		{
+			control->DrawSelf(owner, render, rc);
+		}
+	}
+	void ZLayout::HandleEvent(ZControlMsg& msg)
+	{
+		for each (auto control in m_controlList)
+		{
+			control->HandleEvent(msg);
+		}
+	}
+	void ZLayout::SetHWND(HWND hwnd)
+	{
+		m_parent = hwnd;
+		for each (auto control in m_controlList)
+		{
+			control->SetHWND(hwnd);
+		}
+	}
+	void ZLayout::AddControl(ZControl* control)
+	{
+		m_controlList.push_back(control);
+	}
+	void ZLayout::AdjustLayout()
+	{
+	}
+	//ZLayout end
+	//ZListBox begin
+
+	//ZListBox end
 }

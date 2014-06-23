@@ -27,7 +27,8 @@ namespace ZUI
 				static_cast<BYTE>(color.r * 255.f),
 				static_cast<BYTE>(color.g * 255.f),
 				static_cast<BYTE>(color.b * 255.f),
-				static_cast<BYTE>(color.a * 255.f));
+				static_cast<BYTE>(color.a * 255.f)
+				);
 		}
 		D2D1_POINT_2F ZPointToPointF(ZPoint pt)
 		{
