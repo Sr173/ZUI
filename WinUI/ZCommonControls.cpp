@@ -222,6 +222,71 @@ namespace ZUI
 		}
 	}
 	//ZTextBox end
+	//ZCheckBox begin
+	ZCheckBox::ZCheckBox() :
+		ZLabel(),
+		m_boolChecked(false)
+	{
+		NotifyOnLButtonUp(ClickChecked);
+	}
+	void ZCheckBox::DrawSelf(HWND owner, ZRender* render, const ZRect&rc)
+	{
+		ZSolidBrush *pBrush;
+		ZRenderResult rr = render->CreateSolidBrush(m_backColor, &pBrush);
+		if (rr != ZRENDER_OK) {
+			return;
+		}
+		render->FillRectangle(m_rc, pBrush); 
+		pBrush->SetColor(m_borderColor);
+		render->DrawRectangle(m_rc, pBrush);
+		ZRect checkRc;
+		checkRc.top = (m_rc.bottom + m_rc.top - checkBoxHeight) / 2;
+		checkRc.bottom = checkRc.top + checkBoxHeight;
+		checkRc.left = m_rc.left + 2;
+		checkRc.right = checkRc.left + checkBoxHeight;
+		pBrush->SetColor(ZColor(0, 0, 0));
+		render->DrawRectangle(checkRc, pBrush);
+		pBrush->SetColor(ZColor(255, 255, 255));
+		render->FillRectangle(checkRc, pBrush);
+		if (m_boolChecked) {
+			ZRect fillRc;
+			fillRc.left = checkRc.left + 2;
+			fillRc.right = checkRc.right - 2;
+			fillRc.bottom = checkRc.bottom - 2;
+			fillRc.top = checkRc.top + 2;
+			pBrush->SetColor(ZColor(0, 0, 0));
+			render->FillRectangle(fillRc, pBrush);
+		}
+		ZRect textRc;
+		textRc = m_rc;
+		textRc.left = checkRc.right + 2;
+		ZFontFormat* format;
+		rr = render->CreateFontFormat(
+			L"ËÎÌו", m_fontSize, &format);
+		if (rr == ZRENDER_OK) {
+			pBrush->SetColor(m_fontColor);
+			format->SetTextAlignment(ZFontFormat::TAMMiddle);
+			format->SetParagraphAlignment(ZFontFormat::TAMMiddle);
+			render->PaintText(m_text, textRc, format, pBrush);
+			format->Release();
+		}
+		pBrush->Release();
+	}
+	LONG ZCheckBox::ClickChecked(ZControl* control, ZMouseState s)
+	{
+		ZCheckBox* pThis = dynamic_cast<ZCheckBox*>(control);
+		if (pThis == nullptr) {
+			return -1;
+		}
+		if (pThis->m_boolChecked) {
+			pThis->LostChecked();
+		}
+		else {
+			pThis->SetChecked();
+		}
+		return 0;
+	}
+	//ZCheckBox end
 	//ZLayout begin
 	ZLayout::~ZLayout()
 	{
@@ -270,6 +335,16 @@ namespace ZUI
 	void ZLayout::AddControl(ZControl* control)
 	{
 		m_controlList.push_back(control);
+	}
+	bool ZLayout::RemoveControl(ZString id)
+	{
+		ZControl* control = FindControl(id);
+		if (control == nullptr) return false;
+		for each (ZControl* iter in m_controlList)
+		{
+			if (control == iter) return true;
+		}
+		return false;
 	}
 	void ZLayout::AdjustLayout()
 	{

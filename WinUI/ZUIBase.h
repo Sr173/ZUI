@@ -307,6 +307,17 @@ namespace ZUI
 			control->SetHWND(m_hWnd);
 			m_pControls.push_back(control);
 		}
+		ZControl* FindControl(ZString id)
+		{
+			for each (auto control in m_pControls)
+			{
+				ZControl* ret = control->FindControl(id);
+				if (ret != nullptr) {
+					return ret;
+				}
+			}
+			return nullptr;
+		}
 		bool RemoveControl(ZControl* control) {
 			auto iter = FindControl(control);
 			if (iter == m_pControls.end()) {

@@ -51,25 +51,25 @@ namespace ZUI
 		virtual void		SetBorderColor(BYTE r, BYTE g, BYTE b, BYTE a = 255) {
 			m_borderColor = ZColor(r, g, b, a);
 		}
-		void		SetRect(ZRect rc) {
+		virtual void		SetRect(ZRect rc) {
 			m_rc = rc;
 		}
-		ZRect		GetRect() const {
+		virtual ZRect		GetRect() const {
 			return m_rc;
 		}
-		void		SetWidth(int width) {
+		virtual void		SetWidth(int width) {
 			m_rc.right = m_rc.left + width;
 		}
-		int			GetWidth() const {
+		virtual int			GetWidth() const {
 			return m_rc.right - m_rc.left;
 		}
-		void		SetHeight(int height) {
+		virtual void		SetHeight(int height) {
 			m_rc.bottom = m_rc.top + height;
 		}
-		int			GetHeight() const {
+		virtual int			GetHeight() const {
 			return m_rc.bottom - m_rc.top;
 		}
-		void		SetPosition(int x, int y) {
+		virtual void		SetPosition(int x, int y) {
 			m_rc.right = GetWidth() + x;
 			m_rc.bottom = GetHeight() + y;
 			m_rc.left = x;
@@ -185,6 +185,35 @@ namespace ZUI
 		ZControlEvent	m_lostFocus;
 		ZControlEvent	m_getFocus;
 	};
+	class ZCheckBox :
+		public ZLabel
+	{
+	public:
+		ZCheckBox();
+		virtual ~ZCheckBox()
+		{}
+		virtual const wchar_t* GetType() const {
+			return L"checkbox";
+		}
+	public:
+		virtual void DrawSelf(HWND owner, ZRender* render, const ZRect& rc);
+		virtual bool IsChecked() const {
+			return m_boolChecked;
+		}
+		void SetChecked() {
+			m_boolChecked = true;
+			Invalidate();
+		}
+		void LostChecked() {
+			m_boolChecked = false;
+			Invalidate();
+		}
+	protected:
+		static LONG ClickChecked(ZControl* control, ZMouseState s);
+	private:
+		static const long checkBoxHeight = 12;
+		bool	m_boolChecked;
+	};
 	class ZLayout :
 		public ZControl
 	{
@@ -196,7 +225,6 @@ namespace ZUI
 			return L"layout";
 		}
 	public:
-		virtual ZControl* FindControl(ZString id);
 		virtual void DrawSelf(HWND owner, ZRender* render, const ZRect& rc);
 		virtual void HandleEvent(ZControlMsg& msg);
 		virtual void Release() {
@@ -211,6 +239,8 @@ namespace ZUI
 			m_rc = rc;
 		}
 		void AddControl(ZControl* control);
+		virtual ZControl* FindControl(ZString id);
+		virtual bool RemoveControl(ZString id);
 	protected:
 		void AdjustLayout();
 	protected:

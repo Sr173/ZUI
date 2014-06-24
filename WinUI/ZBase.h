@@ -50,7 +50,38 @@ namespace ZUI
 	private:
 		bool m_bNull;
 	};
-
+	template<typename T>
+	class ZAutoReleasePtr :
+		public ZObject
+	{
+	public:
+		ZAutoReleasePtr(T* p) :
+			m_p(p), m_count(1)
+		{}
+		~ZAutoReleasePtr()
+		{
+			Release();
+		}
+	public:
+		ZAutoReleasePtr(const ZAutoReleasePtr<T>& p)
+		{}
+		ZAutoReleasePtr& operator=(
+			const ZAutoReleasePtr<T>& p)
+		{
+			return *this;
+		}
+	public:
+		unsigned long AddRef()
+		{
+			return 0;
+		}
+		void Release()
+		{
+		}
+	private:
+		unsigned long*	m_count;
+		T*				m_p;
+	};
 	class ZStringA :
 		public ZNullable
 	{

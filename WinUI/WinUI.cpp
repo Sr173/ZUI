@@ -152,6 +152,11 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	layout->AddControl(lbutton1);
 	hellowindow->AddControl(layout);
 	
+	ZUI::ZCheckBox* checkBox1 = new ZUI::ZCheckBox();
+	checkBox1->SetText(L"ÄãºÃ");
+	checkBox1->SetPosition(200, 200);
+	checkBox1->SetBorderColor(255, 255, 255);
+	layout->AddControl(checkBox1);
 	/*
 	textbox->NotifyOnGetFocus(GetFocus);
 	textbox->NotifyOnLostFocus(LostFocus);
