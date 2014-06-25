@@ -38,6 +38,15 @@ LONG BeClick(ZUI::ZControl* con, ZUI::ZMouseState s)
 	::MessageBox(NULL, str.c_str(), _T("Label Click"), 0);
 	return 0;
 }
+LONG ClearText(ZUI::ZControl* con, ZUI::ZMouseState s)
+{
+	HelloWindow* wnd = reinterpret_cast<HelloWindow*>(
+		con->GetParentClass());
+	ZUI::ZTextBox* textBox = dynamic_cast<ZUI::ZTextBox*>(
+		wnd->FindControl(_T("textBox")));
+	textBox->SetText(L"");
+	return 0;
+}
 LONG RClick(ZUI::ZControl* con, ZUI::ZMouseState s)
 {
 	::MessageBox(NULL, _T("Right Click"), _T("Label"), 0);
@@ -67,6 +76,21 @@ LONG LostFocus(ZUI::ZControl* con, void* pInfo)
 	::MessageBox(NULL, _T("LostFocus"), _T("hi"), 0);
 	return 0;
 }
+LONG CheckedChange(ZUI::ZControl* con, void* pInfo)
+{
+	ZUI::ZCheckBox* pThis = dynamic_cast<ZUI::ZCheckBox*>(con);
+	HelloWindow* wnd = reinterpret_cast<HelloWindow*>(
+		pThis->GetParentClass());
+	ZUI::ZLabel* label = dynamic_cast<ZUI::ZLabel*>(
+		wnd->FindControl(_T("checkLabel")));
+	if (pThis->IsChecked()) {
+		label->SetText(L"selected");
+	}
+	else {
+		label->SetText(L"unselected");
+	}
+	return 0;
+}
 int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
                      _In_ LPTSTR    lpCmdLine,
@@ -81,6 +105,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	ZUI::ZLabel* label = new ZUI::ZLabel();
 	label->SetPosition(100, 100);
 	label->SetWidth(200);
+	label->SetId(_T("checkLabel"));
 	label->SetText(L"Control Test");
 	label->SetBackColor(0x66, 0xcc, 0xff, 255);
 	//label->SetBorderColor(0xff, 0, 0);
@@ -143,6 +168,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	textbox->SetPosition(50, 250);
 	textbox->SetHeight(50);
 	textbox->SetTextSize(24);
+	textbox->SetId(_T("textBox"));
 	
 	ZUI::ZButton* lbutton1 = new ZUI::ZButton();
 	lbutton1->SetPosition(150, 150);
@@ -156,11 +182,18 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	checkBox1->SetText(L"你好");
 	checkBox1->SetPosition(200, 200);
 	checkBox1->SetBorderColor(255, 255, 255);
+	checkBox1->NotifyOnCheckedChanged(CheckedChange);
 	layout->AddControl(checkBox1);
+	ZUI::ZButton* clearButton = new ZUI::ZButton();
+	clearButton->SetText(L"清除文本框");
+	clearButton->SetPosition(50, 300);
+	clearButton->SetWidth(80);
+	clearButton->NotifyOnLButtonUp(ClearText);
 	/*
 	textbox->NotifyOnGetFocus(GetFocus);
 	textbox->NotifyOnLostFocus(LostFocus);
 	*/
+	hellowindow->AddControl(clearButton);
 	hellowindow->AddControl(textbox);
 	hellowindow->AddControl(button1);
 	hellowindow->AddControl(label);

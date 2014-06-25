@@ -1,0 +1,87 @@
+	template<typename T>
+	class ZAutoReleasePtr :
+		public ZObject
+	{
+	public:
+		ZAutoReleasePtr() :
+			m_p(nullptr), m_count(new unsigned long(1))
+		{}
+		ZAutoReleasePtr(T* p) :
+			m_p(p), m_count(new unsigned long(1))
+		{}
+		~ZAutoReleasePtr()
+		{
+			if (m_count != nullptr) {
+				Release();
+			}
+		}
+	public:
+		ZAutoReleasePtr(const ZAutoReleasePtr<T>& p) :
+			m_p(p.m_p), m_count(p.m_count)
+		{
+			AddRef();
+		}
+		ZAutoReleasePtr& operator=(
+			const ZAutoReleasePtr<T>& p)
+		{
+			if (p.m_p == m_p) {
+				return *this;
+			}
+			Release();
+			m_p = p.m_p;
+			m_count = p.m_count;
+			AddRef();
+			return *this;
+		}
+	public:
+		operator const T*() const {
+			return m_p;
+		}
+		operator T*() {
+			return m_p;
+		}
+		T* operator->() {
+			return m_p;
+		}
+		T** operator&() {
+			return &m_p;
+		}
+		bool operator==(const ZAutoReleasePtr<T>& p)
+		{
+			return m_p == p.m_p;
+		}
+		bool operator!=(const ZAutoReleasePtr<T>& p)
+		{
+			return m_p != p.m_p;
+		}
+		T* Swap(ZAutoReleasePtr<T>& p)
+		{
+			unsigned long* tmpC = p.m_count;
+			p.m_count = m_count;
+			m_count = tmpC;
+			T* tmpP = p.m_p;
+			p.m_p = m_p;
+			m_p = tmpP;
+			return m_p;
+		}
+		unsigned long AddRef()
+		{
+			++(*m_count);
+			return *m_count;
+		}
+		void Release()
+		{
+			--(*m_count);
+			if (*m_count == 0) {
+				if (m_p != nullptr) {
+					m_p->Release();
+				}
+				delete m_count;
+			}
+			m_p = nullptr;
+			m_count = nullptr;
+		}
+	private:
+		unsigned long*	m_count;
+		T*				m_p;
+	};

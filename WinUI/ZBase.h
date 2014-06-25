@@ -51,36 +51,128 @@ namespace ZUI
 		bool m_bNull;
 	};
 	template<typename T>
+	class ZPtr :
+		public ZObject,
+		public NoCopyable
+	{
+	public:
+		ZPtr() :
+			m_p(nullptr), m_count(1)
+		{}
+		ZPtr(T* p) :
+			m_p(p), m_count(1)
+		{}
+		virtual ~ZPtr()
+		{}
+	public:
+		T* operator->()
+		{
+			return m_p;
+		}
+		T** operator&()
+		{
+			return &m_p;
+		}
+		T* GetPtr()
+		{
+			return m_p;
+		}
+		bool operator==(const ZPtr<T>& p)
+		{
+			return m_p == p.m_p;
+		}
+		unsigned long AddRef()
+		{
+			++m_count;
+			return m_count;
+		}
+		void Release()
+		{
+			--m_count;
+			if (m_count == 0) {
+				if (m_p != nullptr) {
+					m_p->Release();
+				}
+				delete this;
+			}
+		}
+	private:
+		T*				m_p;
+		unsigned long	m_count;
+	};
+	template<typename T>
 	class ZAutoReleasePtr :
 		public ZObject
 	{
 	public:
-		ZAutoReleasePtr(T* p) :
-			m_p(p), m_count(1)
+		ZAutoReleasePtr() :
+			m_p(new ZPtr<T>())
 		{}
-		~ZAutoReleasePtr()
+		ZAutoReleasePtr(T* p) :
+			m_p(new ZPtr<T>(p))
+		{}
+		virtual ~ZAutoReleasePtr()
 		{
 			Release();
 		}
-	public:
-		ZAutoReleasePtr(const ZAutoReleasePtr<T>& p)
-		{}
-		ZAutoReleasePtr& operator=(
-			const ZAutoReleasePtr<T>& p)
+		ZAutoReleasePtr(const ZAutoReleasePtr<T>& p) :
+			m_p(p.m_p)
 		{
+			m_p->AddRef();
+		}
+		ZAutoReleasePtr<T>& operator=(const ZAutoReleasePtr<T>& p)
+		{
+			ZAutoReleasePtr<T> tmp(p);
+			Swap(tmp);
 			return *this;
 		}
 	public:
+		operator T*()
+		{
+			return m_p->GetPtr();
+		}
+		operator const T*() const
+		{
+			return m_p->GetPtr();
+		}
+		T* operator->()
+		{
+			return m_p->GetPtr();
+		}
+		T** operator&()
+		{
+			return &(*m_p);
+		}
+		bool operator==(const ZAutoReleasePtr<T>& p)
+		{
+			if (m_p == nullptr || p.m_p == nullptr) {
+				return false;
+			}
+			return *m_p == *(p.m_p);
+		}
+		bool operator!=(const ZAutoReleasePtr<T>& p)
+		{
+			return !operator==(p);
+		}
+		void Swap(ZAutoReleasePtr<T>& p)
+		{
+			ZPtr<T>* tmp = p.m_p;
+			p.m_p = m_p;
+			m_p = tmp;
+		}
 		unsigned long AddRef()
 		{
-			return 0;
+			m_p->AddRef();
 		}
 		void Release()
 		{
+			if (m_p != nullptr) {
+				m_p->Release();
+			}
+			m_p = nullptr;
 		}
 	private:
-		unsigned long*	m_count;
-		T*				m_p;
+		ZPtr<T>* m_p;
 	};
 	class ZStringA :
 		public ZNullable

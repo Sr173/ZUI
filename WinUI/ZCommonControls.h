@@ -161,6 +161,11 @@ namespace ZUI
 			//TextBox ingore alpha
 			ZLabel::SetBackColor(r, g, b, 255);
 		}
+		virtual void SetText(const ZStringW& str)
+		{
+			ZLabel::SetText(str);
+			Invalidate();
+		}
 	public:
 		void NotifyOnGetFocus(ControlFunc func) {
 			m_getFocus.subscribe(func);
@@ -202,17 +207,23 @@ namespace ZUI
 		}
 		void SetChecked() {
 			m_boolChecked = true;
+			OnCheckedChanged(this, NULL);
 			Invalidate();
 		}
 		void LostChecked() {
 			m_boolChecked = false;
+			OnCheckedChanged(this, NULL);
 			Invalidate();
 		}
+	public:
+		void NotifyOnCheckedChanged(ControlFunc func);
+		LONG OnCheckedChanged(ZControl* control, void* pParam);
 	protected:
 		static LONG ClickChecked(ZControl* control, ZMouseState s);
 	private:
-		static const long checkBoxHeight = 12;
-		bool	m_boolChecked;
+		static const long	checkBoxHeight = 12;
+		bool				m_boolChecked;
+		ZControlEvent		m_checkedChangeEvent;
 	};
 	class ZLayout :
 		public ZControl
@@ -231,6 +242,7 @@ namespace ZUI
 			delete this;
 		}
 		virtual void SetHWND(HWND hwnd);
+		virtual void SetParentClass(void* parent);
 	public:
 		ZRect GetRect() const {
 			return m_rc;

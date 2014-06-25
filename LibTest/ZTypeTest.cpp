@@ -41,8 +41,29 @@ void StringTest()
 	assert(strE.Find("ะกร๗") == 11);
 	assert(strE.Find("asdf") == -1);
 }
+template <typename T>
+void UseP(ZAutoReleasePtr<T> p) {
+	ZAutoReleasePtr<T> pm = p;
+}
+void AutoReleasePtrTest()
+{
+	ZAutoReleasePtr<ZPaintManager> pm = new ZPaintManager();
+	ZAutoReleasePtr<ZPaintManager> pm1 = pm;
+	pm1->Setup(_T("direct2d"));
+	ZAutoReleasePtr<ZPaintManager> pmb = new ZPaintManager();
+	pmb->Setup(_T("gdiplus"));
+	pm1 = pm1;
+	pm1 = nullptr;
+	UseP(pm1);
+	pm1 = pmb;
+	pm.Swap(pmb);
+	assert(pm1 == pm);
+	assert(pm1 != pmb);
+	pm1.Release();
+}
 void ZTypeTest()
 {
 	WStringTest();
 	StringTest();
+	AutoReleasePtrTest();
 }

@@ -22,6 +22,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
+    <Text Include="PtrBackup.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">

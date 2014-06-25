@@ -16,7 +16,7 @@ namespace ZUI
 		if (render == nullptr) return;
 		//if (!IsRectCross(_rc, m_rc)) return;
 		//ZRender* render = painter->CreateRender(owner, m_rc);
-		ZSolidBrush* pBrush;
+		ZAutoReleasePtr<ZSolidBrush> pBrush;
 		ZRenderResult rr = render->CreateSolidBrush(m_backColor, &pBrush);
 		if (rr < 0) return;
 		render->FillRectangle(m_rc, pBrush);
@@ -24,16 +24,14 @@ namespace ZUI
 		render->DrawRectangle(m_rc, pBrush);
 		pBrush->SetColor(m_fontColor);
 		if (!m_text.IsNull()) {
-			ZFontFormat *fontFormat;
+			ZAutoReleasePtr<ZFontFormat> fontFormat;
 			rr = render->CreateFontFormat(L"ËÎÌו", m_fontSize, &fontFormat);
 			if (rr >= 0) {
 				fontFormat->SetTextAlignment(ZFontFormat::TAMMiddle);
 				fontFormat->SetParagraphAlignment(ZFontFormat::TAMMiddle);
 				render->PaintText(m_text, m_rc, fontFormat, pBrush);
-				fontFormat->Release();
 			}
 		}
-		pBrush->Release();
 	}
 	void ZLabel::HandleEvent(ZControlMsg& msg)
 	{
@@ -272,6 +270,15 @@ namespace ZUI
 		}
 		pBrush->Release();
 	}
+	void ZCheckBox::NotifyOnCheckedChanged(ControlFunc func)
+	{
+		m_checkedChangeEvent.subscribe(func);
+	}
+	LONG ZCheckBox::OnCheckedChanged(ZControl* control, void* pParam)
+	{
+		m_checkedChangeEvent.Invoke(control, pParam);
+		return 0;
+	}
 	LONG ZCheckBox::ClickChecked(ZControl* control, ZMouseState s)
 	{
 		ZCheckBox* pThis = dynamic_cast<ZCheckBox*>(control);
@@ -332,8 +339,17 @@ namespace ZUI
 			control->SetHWND(hwnd);
 		}
 	}
+	void ZLayout::SetParentClass(void* parent)
+	{
+		m_parentClass = parent;
+		for each (auto control in m_controlList)
+		{
+			control->SetParentClass(parent);
+		}
+	}
 	void ZLayout::AddControl(ZControl* control)
 	{
+		control->SetParentClass(m_parentClass);
 		m_controlList.push_back(control);
 	}
 	bool ZLayout::RemoveControl(ZString id)

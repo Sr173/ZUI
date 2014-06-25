@@ -1,5 +1,7 @@
 #pragma once
 #include "..\WinUI\ZHead.h"
+#include <stdlib.h>
+#include <tchar.h>
 #include <assert.h>
 void ZEventTest();
 void ZFuncTest();

@@ -81,6 +81,13 @@ namespace ZUI
 		{
 			m_parent = hwnd;
 		}
+		virtual void SetParentClass(void* parent)
+		{
+			m_parentClass = parent;
+		}
+		virtual void* GetParentClass() const {
+			return m_parentClass;
+		}
 		virtual void SetFocus() {
 			m_bFocus = true;
 		}
@@ -109,6 +116,7 @@ namespace ZUI
 		HWND		m_parent;
 		ZString		m_id;
 		bool		m_bFocus;
+		void*		m_parentClass;
 	};
 
 	template <class WndCls>
@@ -305,6 +313,7 @@ namespace ZUI
 		void AddControl(ZControl* control) {
 			assert(control != NULL);
 			control->SetHWND(m_hWnd);
+			control->SetParentClass(this);
 			m_pControls.push_back(control);
 		}
 		ZControl* FindControl(ZString id)
