@@ -162,7 +162,7 @@ namespace ZUI
 	{
 	public:
 		ZDirect2DRender(HWND hWnd, ZSize size) :
-			m_hWnd(hWnd)
+			m_hWnd(hWnd), m_cPushLayer(0)
 		{
 			m_size.width = static_cast<UINT32>(size.width);
 			m_size.height = static_cast<UINT32>(size.height);
@@ -294,12 +294,18 @@ namespace ZUI
 				return ZRENDER_BAD_PARAM;
 			}
 			else {
+				CComPtr<ID2D1Layer> layer;
+				m_pRT->CreateLayer(&layer);
+				m_pRT->PushLayer(D2D1::LayerParameters(
+					ZRectToRectF(rc)), layer);
 				m_pRT->DrawTextW(text.c_str(), text.Length(),
 					pD2DFormat->GetTextFormat(), ZRectToRectF(rc),
 					pD2DBrush->GetBrush());
+				m_pRT->PopLayer();
 				return ZRENDER_OK;
 			}
 		}
+
 		virtual ZRenderResult	Clear(ZColor color)
 		{
 			m_pRT->Clear(ZColorToColorF(color));
@@ -319,6 +325,25 @@ namespace ZUI
 			else {
 				return ZRENDER_OK;
 			}
+		}
+		virtual ZRenderResult	PushLayer(const ZRect& rc)
+		{
+			CComPtr<ID2D1Layer> pLayer;
+			HRESULT hr = m_pRT->CreateLayer(&pLayer);
+			if (FAILED(hr)) return ZRENDER_FAIL;
+			m_pRT->PushLayer(D2D1::LayerParameters(
+				ZRectToRectF(rc)), pLayer);
+			++m_cPushLayer;
+			return ZRENDER_OK;
+		}
+		virtual ZRenderResult	PopLayer()
+		{
+			if (m_cPushLayer == 0) {
+				return ZRENDER_FAIL;
+			}
+			m_pRT->PopLayer();
+			--m_cPushLayer;
+			return ZRENDER_OK;
 		}
 		virtual void			Release() {
 			delete this;
@@ -359,6 +384,8 @@ namespace ZUI
 		CComPtr<ID2D1HwndRenderTarget>	m_pRT;
 		HWND							m_hWnd;
 		D2D1_SIZE_U						m_size;
+
+		long							m_cPushLayer;
 	};
 }
 #endif //ZUI_ZDIRECT2DRENDER_HEADER

@@ -72,6 +72,8 @@ namespace ZUI
 		virtual ZRenderResult	DrawEllipse(ZPoint pt, long rx, long ry, ZBrush* pBrush) = 0;
 		virtual ZRenderResult	PaintText(ZStringW text, ZRect rc, ZFontFormat* format, ZBrush* pBrush) = 0;
 		virtual ZRenderResult	ReSize(ZSize size) = 0;
+		virtual ZRenderResult	PushLayer(const ZRect& rc) = 0;
+		virtual ZRenderResult	PopLayer() = 0;
 		virtual ZRenderResult	Clear(ZColor color) = 0;
 	public:
 		virtual void			Release() = 0;

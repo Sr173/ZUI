@@ -49,7 +49,8 @@ namespace ZUI
 	public:
 		ZControl() :
 			m_parent(NULL),
-			m_bFocus(false)
+			m_bFocus(false),
+			m_bVisible(true)
 		{
 			m_id.SetNull(true);
 		}
@@ -94,6 +95,12 @@ namespace ZUI
 		virtual void LostFocus() {
 			m_bFocus = false;
 		}
+		virtual void SetVisible(bool visible) {
+			m_bVisible = visible;
+		}
+		virtual bool GetVisible() const {
+			return m_bVisible;
+		}
 		virtual bool IsFocus() const {
 			return m_bFocus;
 		}
@@ -116,6 +123,7 @@ namespace ZUI
 		HWND		m_parent;
 		ZString		m_id;
 		bool		m_bFocus;
+		bool		m_bVisible;
 		void*		m_parentClass;
 	};
 

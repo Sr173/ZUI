@@ -13,6 +13,7 @@ namespace ZUI
 	void ZLabel::DrawSelf(HWND owner, ZRender* render, const ZRect& _rc)
 	{
 		assert(IsWindow(owner));
+		if (!GetVisible()) return;
 		if (render == nullptr) return;
 		//if (!IsRectCross(_rc, m_rc)) return;
 		//ZRender* render = painter->CreateRender(owner, m_rc);
@@ -27,9 +28,10 @@ namespace ZUI
 			ZAutoReleasePtr<ZFontFormat> fontFormat;
 			rr = render->CreateFontFormat(L"ËÎÌו", m_fontSize, &fontFormat);
 			if (rr >= 0) {
-				fontFormat->SetTextAlignment(ZFontFormat::TAMMiddle);
-				fontFormat->SetParagraphAlignment(ZFontFormat::TAMMiddle);
+				fontFormat->SetTextAlignment(ZFontFormat::TAMNear);
+				fontFormat->SetParagraphAlignment(ZFontFormat::TAMNear);
 				render->PaintText(m_text, m_rc, fontFormat, pBrush);
+				
 			}
 		}
 	}
@@ -51,6 +53,14 @@ namespace ZUI
 			OnMouseMove(this, mouseState);
 		default:
 			break;
+		}
+	}
+	void ZLabel::SetVisible(bool visible)
+	{
+		bool bChanged = m_bVisible != visible;
+		m_bVisible = visible;
+		if (bChanged) {
+			Invalidate();
 		}
 	}
 	void ZLabel::Release()
@@ -229,6 +239,7 @@ namespace ZUI
 	}
 	void ZCheckBox::DrawSelf(HWND owner, ZRender* render, const ZRect&rc)
 	{
+		if (!GetVisible()) return;
 		ZSolidBrush *pBrush;
 		ZRenderResult rr = render->CreateSolidBrush(m_backColor, &pBrush);
 		if (rr != ZRENDER_OK) {
@@ -318,17 +329,28 @@ namespace ZUI
 	}
 	void ZLayout::DrawSelf(HWND owner, ZRender* render, const ZRect& rc)
 	{
+		if (!GetVisible()) return;
 		AdjustLayout();
+		render->PushLayer(m_rc);
 		for each (auto control in m_controlList)
 		{
 			control->DrawSelf(owner, render, rc);
 		}
+		render->PopLayer();
 	}
 	void ZLayout::HandleEvent(ZControlMsg& msg)
 	{
 		for each (auto control in m_controlList)
 		{
 			control->HandleEvent(msg);
+		}
+	}
+	void ZLayout::SetVisible(bool visible)
+	{
+		bool bChanged = m_bVisible != visible;
+		m_bVisible = visible;
+		if (bChanged) {
+			Invalidate();
 		}
 	}
 	void ZLayout::SetHWND(HWND hwnd)

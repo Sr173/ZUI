@@ -31,6 +31,7 @@ namespace ZUI
 		//ZControl methods
 		virtual void DrawSelf(HWND owner, ZRender* render, const ZRect& rc);
 		virtual void HandleEvent(ZControlMsg& msg);
+		virtual void SetVisible(bool visible);
 		virtual void Release();
 	public:
 		virtual void		SetText(const ZStringW& text) {
@@ -238,6 +239,7 @@ namespace ZUI
 	public:
 		virtual void DrawSelf(HWND owner, ZRender* render, const ZRect& rc);
 		virtual void HandleEvent(ZControlMsg& msg);
+		virtual void SetVisible(bool visible);
 		virtual void Release() {
 			delete this;
 		}
@@ -254,6 +256,17 @@ namespace ZUI
 		virtual ZControl* FindControl(ZString id);
 		virtual bool RemoveControl(ZString id);
 	protected:
+		void Invalidate()
+		{
+			if (::IsWindow(m_parent)) {
+				RECT rc;
+				rc.left = m_rc.left;
+				rc.right = m_rc.right;
+				rc.bottom = m_rc.bottom;
+				rc.top = m_rc.top;
+				::InvalidateRect(m_parent, &rc, TRUE);
+			}
+		}
 		void AdjustLayout();
 	protected:
 		ZRect					m_rc;

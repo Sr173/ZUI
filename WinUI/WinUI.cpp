@@ -83,11 +83,15 @@ LONG CheckedChange(ZUI::ZControl* con, void* pInfo)
 		pThis->GetParentClass());
 	ZUI::ZLabel* label = dynamic_cast<ZUI::ZLabel*>(
 		wnd->FindControl(_T("checkLabel")));
+	ZUI::ZButton* button = dynamic_cast<ZUI::ZButton*>(
+		wnd->FindControl(_T("button1")));
 	if (pThis->IsChecked()) {
 		label->SetText(L"selected");
+		button->SetVisible(true);
 	}
 	else {
 		label->SetText(L"unselected");
+		button->SetVisible(false);
 	}
 	return 0;
 }
@@ -123,6 +127,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	//button1->SetWidth(100);
 	button1->SetHoverColor(0xff, 0x00, 0xff, 127);
 	button1->SetText(L"²âÊÔ°´Å¥");
+	button1->SetId(_T("button1"));
 	button1->SetBackColor(0x66, 0xcc, 0xff, 255);
 	button1->NotifyOnLButtonUp(BeClick);
 	button1->NotifyOnRButtonUp(RClick);
@@ -175,6 +180,8 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	lbutton1->SetText(_T("layout button"));
 	lbutton1->NotifyOnLButtonUp(BeClick);
 	ZUI::ZLayout* layout = new ZUI::ZLayout();
+	ZUI::ZRect layoutRc = { 0, 0, 300, 500 };
+	layout->SetRect(layoutRc);
 	layout->AddControl(lbutton1);
 	hellowindow->AddControl(layout);
 	
