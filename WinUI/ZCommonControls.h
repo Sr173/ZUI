@@ -252,6 +252,7 @@ namespace ZUI
 		void SetRect(const ZRect& rc) {
 			m_rc = rc;
 		}
+		virtual void SetBackImage(ZStringW imagePath);
 		void AddControl(ZControl* control);
 		virtual ZControl* FindControl(ZString id);
 		virtual bool RemoveControl(ZString id);
@@ -269,9 +270,13 @@ namespace ZUI
 		}
 		void AdjustLayout();
 	protected:
-		ZRect					m_rc;
-		std::list<ZControl*>	m_controlList;
+		ZRect						m_rc;
+		std::list<ZControl*>		m_controlList;
+
+		ZStringW					m_bitmapPath;
+		ZAutoReleasePtr<ZBitmap>	m_pBitmap;
 	};
+
 }
 
 

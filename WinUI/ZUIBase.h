@@ -144,6 +144,7 @@ namespace ZUI
 			{
 				control->Release();
 			}
+			m_backBitmap.Release();
 			if (m_render != nullptr) {
 				m_render->Release();
 			}
@@ -203,6 +204,10 @@ namespace ZUI
 		BOOL GetWindowRect(LPRECT rc) {
 			assert(m_hWnd != NULL);
 			return ::GetWindowRect(m_hWnd, rc);
+		}
+		void SetBackImage(ZStringW imagePath)
+		{
+			m_backBitmapPath = imagePath;
 		}
 		void Invalidate() {
 			assert(m_hWnd != NULL);
@@ -311,6 +316,18 @@ namespace ZUI
 			render->BeginRender();
 			render->Clear(m_backColor);
 			ZRect zrc = RECT2ZRect(rc);
+			if (!m_backBitmapPath.IsNull()) {
+				ZRenderResult zrr = ZRENDER_OK;
+				if (m_backBitmap.IsNull()) {
+					zrr = render->CreateBitmap(m_backBitmapPath, &m_backBitmap);
+				}
+				RECT mrc;
+				GetClientRect(&mrc);
+				if (zrr == ZRENDER_OK) {
+					render->PaintImage(m_backBitmap, RECT2ZRect(mrc), 255);
+				}
+			}
+
 			for each (auto control in m_pControls)
 			{
 				control->DrawSelf(m_hWnd, render, zrc);
@@ -377,12 +394,14 @@ namespace ZUI
 			return m_pControls.end();
 		}
 	protected:
-		HWND					m_hWnd;
+		HWND						m_hWnd;
 	private:
-		std::vector<ZControl*>	m_pControls;
-		ZPaintManager*			m_paintManager;
-		ZRender*				m_render;
-		ZColor					m_backColor;
+		std::vector<ZControl*>		m_pControls;
+		ZPaintManager*				m_paintManager;
+		ZRender*					m_render;
+		ZColor						m_backColor;
+		ZStringW					m_backBitmapPath;
+		ZAutoReleasePtr<ZBitmap>	m_backBitmap;
 	};
 }
 #endif //ZUI_ZUIBASE_HEADER

@@ -180,9 +180,10 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	lbutton1->SetText(_T("layout button"));
 	lbutton1->NotifyOnLButtonUp(BeClick);
 	ZUI::ZLayout* layout = new ZUI::ZLayout();
-	ZUI::ZRect layoutRc = { 0, 0, 300, 500 };
+	ZUI::ZRect layoutRc = { 0, 0, 600, 783 };
 	layout->SetRect(layoutRc);
 	layout->AddControl(lbutton1);
+	//layout->SetBackImage(L"D:\\立华奏cosplay\\201311cutted\\41.png");
 	hellowindow->AddControl(layout);
 	
 	ZUI::ZCheckBox* checkBox1 = new ZUI::ZCheckBox();
@@ -204,14 +205,16 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	hellowindow->AddControl(textbox);
 	hellowindow->AddControl(button1);
 	hellowindow->AddControl(label);
+	hellowindow->SetBackImage(L"D:\\立华奏cosplay\\201311cutted\\41.png");
 	hellowindow->Create(L"hellowindow", WS_OVERLAPPEDWINDOW);
 	hellowindow->Show();
-
+	
 	ZUI::ZPaintManager::MessageLoop();
 	paintManager->Release();
 	delete hellowindow;
 	//delete msgwindow;
 	_CrtDumpMemoryLeaks();
+
 	return 0;
 }
 

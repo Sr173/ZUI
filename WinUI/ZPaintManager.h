@@ -2,6 +2,7 @@
 #define ZUI_ZPAINTMANAGER_HEADER
 #include "ZBase.h"
 #include <Windows.h>
+#include <Objbase.h>
 #include "ZRender.h"
 namespace ZUI
 {
@@ -25,7 +26,6 @@ namespace ZUI
 		~ZPaintManager()
 		{
 			Clear();
-			
 		}
 		void Release()
 		{

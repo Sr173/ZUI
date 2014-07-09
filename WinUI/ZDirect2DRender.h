@@ -6,6 +6,8 @@
 #pragma comment(lib, "d2d1.lib")
 #include <dwrite.h>
 #pragma comment(lib, "dwrite.lib")
+#include <wincodec.h>
+#pragma comment(lib, "Windowscodecs.lib")
 
 #include "ZRender.h"
 namespace ZUI
@@ -55,6 +57,13 @@ namespace ZUI
 			return D2D1::SizeU(
 				static_cast<UINT32>(size.width),
 				static_cast<UINT32>(size.height));
+		}
+		ZSize SizeFToZSize(D2D1_SIZE_F size)
+		{
+			ZSize tmp;
+			tmp.height = static_cast<long>(size.height);
+			tmp.width = static_cast<long>(size.width);
+			return tmp;
 		}
 		DWRITE_TEXT_ALIGNMENT TextAlign2DirectAlign(ZFontFormat::TextAlignMode mode)
 		{
@@ -157,6 +166,36 @@ namespace ZUI
 	private:
 		CComPtr<IDWriteTextFormat>	m_textFormat;
 	};
+	class ZDirect2DBitmap :
+		public ZBitmap
+	{
+	public:
+		ZDirect2DBitmap(CComPtr<ID2D1Bitmap> pBitmap) :
+			m_pBitmap(pBitmap)
+		{
+		}
+		virtual ~ZDirect2DBitmap()
+		{
+			m_pBitmap.Release();
+		}
+	public:
+		virtual ZSize GetSize() const
+		{
+			return SizeFToZSize(m_pBitmap->GetSize());
+		}
+		virtual void Release()
+		{
+			delete this;
+		}
+	public:
+		ID2D1Bitmap* GetBitmap()
+		{
+			return m_pBitmap;
+		}
+	private:
+		CComPtr<ID2D1Bitmap> m_pBitmap;
+	};
+
 	class ZDirect2DRender :
 		public ZRender
 	{
@@ -164,6 +203,7 @@ namespace ZUI
 		ZDirect2DRender(HWND hWnd, ZSize size) :
 			m_hWnd(hWnd), m_cPushLayer(0)
 		{
+			::CoInitialize(NULL);
 			m_size.width = static_cast<UINT32>(size.width);
 			m_size.height = static_cast<UINT32>(size.height);
 			InitFactoryResource();
@@ -172,6 +212,7 @@ namespace ZUI
 		virtual ~ZDirect2DRender()
 		{
 			ClearAllResource();
+			::CoUninitialize();
 		}
 	public:
 		virtual ZRenderResult	BeginRender()
@@ -227,6 +268,19 @@ namespace ZUI
 			}
 			else {
 				*ppFontFormat = new ZD2DFontFormat(textFormat);
+				return ZRENDER_OK;
+			}
+		}
+		virtual ZRenderResult	CreateBitmap(ZStringW imageFilePath, ZBitmap** ppBitmap)
+		{
+			CComPtr<ID2D1Bitmap> pBitmap;
+			HRESULT hr = LoadBitmapFromFile(m_pRT, imageFilePath, &pBitmap);
+			if (FAILED(hr)) {
+				return ZRENDER_FAIL;
+			}
+			else {
+				ZDirect2DBitmap* pZBitmap = new ZDirect2DBitmap(pBitmap);
+				*ppBitmap = pZBitmap;
 				return ZRENDER_OK;
 			}
 		}
@@ -294,18 +348,25 @@ namespace ZUI
 				return ZRENDER_BAD_PARAM;
 			}
 			else {
-				CComPtr<ID2D1Layer> layer;
-				m_pRT->CreateLayer(&layer);
-				m_pRT->PushLayer(D2D1::LayerParameters(
-					ZRectToRectF(rc)), layer);
 				m_pRT->DrawTextW(text.c_str(), text.Length(),
 					pD2DFormat->GetTextFormat(), ZRectToRectF(rc),
 					pD2DBrush->GetBrush());
-				m_pRT->PopLayer();
 				return ZRENDER_OK;
 			}
 		}
-
+		virtual ZRenderResult	PaintImage(ZBitmap* pBitmap, const ZRect& rc, BYTE opacity)
+		{
+			ZDirect2DBitmap* pD2DBitmap = dynamic_cast<ZDirect2DBitmap*>(pBitmap);
+			if (pD2DBitmap == nullptr) {
+				return ZRENDER_FAIL;
+			}
+			m_pRT->DrawBitmap(
+				pD2DBitmap->GetBitmap(),
+				ZRectToRectF(rc),
+				static_cast<FLOAT>(opacity) / 255.f
+				);
+			return ZRENDER_OK;
+		}
 		virtual ZRenderResult	Clear(ZColor color)
 		{
 			m_pRT->Clear(ZColorToColorF(color));
@@ -348,6 +409,8 @@ namespace ZUI
 		virtual void			Release() {
 			delete this;
 		}
+	public:
+
 	private:
 		void InitFactoryResource()
 		{
@@ -358,6 +421,8 @@ namespace ZUI
 				DWRITE_FACTORY_TYPE_SHARED,
 				__uuidof(IDWriteFactory),
 				reinterpret_cast<IUnknown**>(&m_pDWriteFactory));
+			HRESULT hr = m_pWICImageFactory.CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_ALL);
+			
 		}
 		void InitTargetResource()
 		{
@@ -368,19 +433,112 @@ namespace ZUI
 		}
 		void ClearAllResource()
 		{
+			m_pRT.Release();
 			m_pD2DFactory.Release();
 			m_pDWriteFactory.Release();
-			m_pRT.Release();
+			m_pWICImageFactory.Release();
 		}
 		void DiscardTargetResource()
 		{
 			m_pRT.Release();
 		}
 	private:
+		HRESULT LoadBitmapFromDecoder(CComPtr<ID2D1HwndRenderTarget> target,
+			CComPtr<IWICBitmapDecoder> pDecoder, ID2D1Bitmap** ppBitmap)
+		{
+			HRESULT hr = S_OK;
+			CComPtr<IWICBitmapFrameDecode> pSource;
+			CComPtr<IWICFormatConverter> pConverter;
+			CComPtr<IWICBitmapScaler> pScaler;
+			hr = pDecoder->GetFrame(0, &pSource);
+			if (FAILED(hr)) {
+				return hr;
+			}
+			hr = m_pWICImageFactory->CreateFormatConverter(&pConverter);
+			if (FAILED(hr)) {
+				return hr;
+			}
+			hr = pConverter->Initialize(
+				pSource,
+				GUID_WICPixelFormat32bppPBGRA,
+				WICBitmapDitherTypeNone,
+				NULL,
+				0.f,
+				WICBitmapPaletteTypeMedianCut);
+			if (FAILED(hr)) {
+				return hr;
+			}
+			hr = target->CreateBitmapFromWicBitmap(
+				pConverter,
+				NULL,
+				ppBitmap);
+			return hr;
+		}
+		HRESULT LoadBitmapFromFile(CComPtr<ID2D1HwndRenderTarget> target,
+			ZStringW imagePath, ID2D1Bitmap** ppBitmap)
+		{
+			HRESULT hr = S_OK;
+			CComPtr<IWICBitmapDecoder> pDecoder;
+			hr = m_pWICImageFactory->CreateDecoderFromFilename(
+				imagePath.c_str(),
+				NULL, GENERIC_READ,
+				WICDecodeMetadataCacheOnLoad,
+				&pDecoder);
+			if (FAILED(hr)) {
+				return hr;
+			}
+			return LoadBitmapFromDecoder(target, pDecoder, ppBitmap);
+		}
+		HRESULT LoadBitmapFromResource(CComPtr<ID2D1HwndRenderTarget> target,
+			ZStringW resourceName, ZStringW resourceType, ID2D1Bitmap** ppBitmap)
+		{
+			CComPtr<IWICBitmapDecoder> pDecoder;
+			CComPtr<IWICStream> pStream;
+			HRSRC imageResHandle = NULL;
+			HGLOBAL imageResDataHandle = NULL;
+			void* pImageFile = NULL;
+			DWORD imageFileSize = 0;
 
+			imageResHandle = FindResourceW(NULL, resourceName.c_str(), resourceType.c_str());
+			HRESULT hr = imageResHandle ? S_OK : E_FAIL;
+			if (FAILED(hr)) {
+				return hr;
+			}
+			imageResDataHandle = LoadResource(NULL, imageResHandle);
+			hr = imageResDataHandle ? S_OK : E_FAIL;
+			if (FAILED(hr)) {
+				return hr;
+			}
+			pImageFile = LockResource(imageResDataHandle);
+			hr = pImageFile ? S_OK : E_FAIL;
+			if (SUCCEEDED(hr)) {
+				imageFileSize = SizeofResource(NULL, imageResHandle);
+				hr = imageFileSize ? S_OK : E_FAIL;
+			}
+			if (SUCCEEDED(hr)) {
+				hr = m_pWICImageFactory->CreateStream(&pStream);
+			}
+			if (SUCCEEDED(hr)) {
+				hr = pStream->InitializeFromMemory(
+					reinterpret_cast<BYTE*>(pImageFile),
+					imageFileSize);
+			}
+			if (SUCCEEDED(hr)) {
+				hr = m_pWICImageFactory->CreateDecoderFromStream(
+					pStream,
+					NULL,
+					WICDecodeMetadataCacheOnLoad,
+					&pDecoder);
+			}
+			if (SUCCEEDED(hr)) {
+				hr = LoadBitmapFromDecoder(target, pDecoder, ppBitmap);
+			}
+			return hr;
+		}
 	private:
 		CComPtr<ID2D1Factory>			m_pD2DFactory;
 		CComPtr<IDWriteFactory>			m_pDWriteFactory;
+		CComPtr<IWICImagingFactory>		m_pWICImageFactory;
 		CComPtr<ID2D1HwndRenderTarget>	m_pRT;
 		HWND							m_hWnd;
 		D2D1_SIZE_U						m_size;

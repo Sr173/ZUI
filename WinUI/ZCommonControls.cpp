@@ -30,8 +30,9 @@ namespace ZUI
 			if (rr >= 0) {
 				fontFormat->SetTextAlignment(ZFontFormat::TAMNear);
 				fontFormat->SetParagraphAlignment(ZFontFormat::TAMNear);
+				render->PushLayer(m_rc);
 				render->PaintText(m_text, m_rc, fontFormat, pBrush);
-				
+				render->PopLayer();
 			}
 		}
 	}
@@ -332,6 +333,15 @@ namespace ZUI
 		if (!GetVisible()) return;
 		AdjustLayout();
 		render->PushLayer(m_rc);
+		if (!m_bitmapPath.IsNull()) {
+			auto zRet = ZRENDER_OK;
+			if (m_pBitmap.IsNull()) {
+				zRet = render->CreateBitmap(m_bitmapPath, &m_pBitmap);
+			}
+			if (zRet == ZRENDER_OK) {
+				render->PaintImage(m_pBitmap, m_rc, 255);
+			}
+		}
 		for each (auto control in m_controlList)
 		{
 			control->DrawSelf(owner, render, rc);
@@ -368,6 +378,10 @@ namespace ZUI
 		{
 			control->SetParentClass(parent);
 		}
+	}
+	void ZLayout::SetBackImage(ZStringW imagePath)
+	{
+		m_bitmapPath = imagePath;
 	}
 	void ZLayout::AddControl(ZControl* control)
 	{

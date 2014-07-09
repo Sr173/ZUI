@@ -52,6 +52,20 @@ namespace ZUI
 		virtual void SetTextAlignment(TextAlignMode mode) = 0;
 		virtual void SetParagraphAlignment(TextAlignMode mode) = 0;
 	};
+	class ZBitmap :
+		public ZObject
+	{
+	public:
+		virtual ~ZBitmap()
+		{}
+		virtual const wchar_t* GetType() const {
+			return L"bitmap";
+		}
+	public:
+		virtual ZSize GetSize() const = 0;
+		virtual void Release() = 0;
+	};
+
 	class ZRender :
 		public ZObject,
 		public NoCopyable
@@ -65,12 +79,14 @@ namespace ZUI
 	public:
 		virtual ZRenderResult	CreateSolidBrush(ZColor color, ZSolidBrush** ppBrush) = 0;
 		virtual ZRenderResult	CreateFontFormat(ZStringW fontFamily, long fontSize, ZFontFormat** ppFontFormat) = 0;
+		virtual ZRenderResult	CreateBitmap(ZStringW imageFilePath, ZBitmap** ppBitmap) = 0;
 	public:
 		virtual ZRenderResult	DrawRectangle(ZRect rc, ZBrush* pBrush) = 0;
 		virtual ZRenderResult	DrawLine(ZPoint pt1, ZPoint pt2, ZBrush* pBrush) = 0;
 		virtual ZRenderResult	FillRectangle(ZRect rc, ZBrush* pBrush) = 0;
 		virtual ZRenderResult	DrawEllipse(ZPoint pt, long rx, long ry, ZBrush* pBrush) = 0;
 		virtual ZRenderResult	PaintText(ZStringW text, ZRect rc, ZFontFormat* format, ZBrush* pBrush) = 0;
+		virtual ZRenderResult	PaintImage(ZBitmap* pBitmap, const ZRect& rc, BYTE opacity) = 0;
 		virtual ZRenderResult	ReSize(ZSize size) = 0;
 		virtual ZRenderResult	PushLayer(const ZRect& rc) = 0;
 		virtual ZRenderResult	PopLayer() = 0;

@@ -143,6 +143,14 @@ namespace ZUI
 		{
 			return &(*m_p);
 		}
+		bool IsNull() const {
+			return m_p->GetPtr() == nullptr;
+		}
+		bool operator==(const T* p)
+		{
+			ZAutoReleasePtr<T> tmpP = new ZAutoReleasePtr(p);
+			return *this == tmpP;
+		}
 		bool operator==(const ZAutoReleasePtr<T>& p)
 		{
 			if (m_p == nullptr || p.m_p == nullptr) {
@@ -540,6 +548,6 @@ namespace ZUI
 		return PointInRect(pt.x, pt.y, rc);
 	}
 	bool IsRectCross(const ZRect& rc1, const ZRect& rc2);
-	
+
 }
 #endif //ZUI_ZBASE_HEADER
